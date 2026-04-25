@@ -1,24 +1,8 @@
-# Project Report
+# M2 - Report
 
-## Primary IDE: Claude Code
+## IDE:
 
-### How It Was Used in This Project
-
-- **Setup**: forked the repo, cloned locally, created `.env`, installed dependencies
-- **Environment fixes**: identified macOS port 5000 conflict, switched backend to 5001, updated frontend proxy
-- **Compatibility fix**: added `NODE_OPTIONS=--openssl-legacy-provider` to `frontend/package.json` scripts for Node 17+ / webpack 4 incompatibility
-- **Database**: started MongoDB via Docker (`mongo:7`), seeded sample data with `npm run data:import`
-- **Documentation**: split monolithic `CLAUDE.md` into three scoped files (`/`, `backend/`, `frontend/`) to stay within 150-line limit per file
-
-### CLAUDE.md Structure
-
-Claude Code loads `CLAUDE.md` files automatically — from the project root and from any subdirectory being worked in:
-
-```
-CLAUDE.md              # project overview, commands, env, gotchas
-backend/CLAUDE.md      # backend architecture, code review rules, deployment
-frontend/CLAUDE.md     # frontend architecture, Redux patterns, code review rules
-```
+- Primary: Claude Code -> /proshop_mern/CLAUDE.md
 
 ## Rules diff
 
@@ -57,3 +41,24 @@ Added to root `CLAUDE.md` to codify patterns and pitfalls:
   db.orders.find() - See all orders
 
 Ran locally using Docker mongo and 'npm run dev'
+
+## NH-1 Mermaid-diagramm
+
+- Done
+
+## NH-2 ADPx3
+
+- Done
+
+## NH-3 Characterization tests for 1 function
+
+I picked 'payOrder'
+Tests were generated: /Users/Veronica_Lapunka/Documents/git3/proshop_mern/frontend/src/actions/**tests**/payOrder.test.js
+Command for run tests:
+cd frontend && npm test -- src/actions/**tests**/payOrder.test.js --watchAll=false
+
+## 3 questions
+
+- ~5 hours
+- I used promt for diagramm generation
+- AI generated tests, but some of them failed. Later AI fixed them (e.g. The issue is that redux-mock-store doesn't propagate async errors the same way. Let me fix the tests to characterize the actual behavior)
