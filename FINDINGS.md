@@ -1,0 +1,30 @@
+# FINDINGS — proshop_mern
+
+Quality review findings from senior code review. Sorted by risk level.
+
+| # | Risk | Location | Problem | How to Fix | Status |
+|---|------|----------|---------|-----------|--------|
+| 1 | 🔴 CRITICAL | `package.json` + `frontend/package.json` | Severely outdated dependencies: Mongoose 5.10.6 (2020), React 16.13.1 (2020), Express 4.17.1 — all 4–6 years old with known security vulnerabilities and breaking changes in modern ecosystem | Upgrade to: Mongoose 8.x, React 19.x, Express 4.18.x; handle breaking changes (e.g., Mongoose syntax changes, React Hook updates) and test thoroughly | 🔴 Not yet |
+| 2 | 🔴 CRITICAL | `backend/config/db.js:8` | `useCreateIndex: true` option was removed in Mongoose 6+; attempting upgrade will crash on startup with no clear error | Remove `useCreateIndex: true` from mongoose.connect options before any Mongoose version bump | 🔴 Not yet |
+| 3 | 🔴 CRITICAL | `backend/server.js:53` | PORT defaults to 5000, which is held by macOS Control Center; breaks development on macOS out-of-the-box despite CLAUDE.md documenting port 5001 | Change `const PORT = process.env.PORT \|\| 5000` to `5001` to match documented behavior and avoid system port conflict | 🔴 Not yet |
+| 4 | 🔴 CRITICAL | `frontend/src/store.js:68–74` | Redux `initialState` restores `cartItems` and `shippingAddress` from localStorage but omits `paymentMethod`; users lose payment choice on page refresh during checkout flow | Add payment method restoration: `const paymentMethodFromStorage = localStorage.getItem('paymentMethod') ? JSON.parse(localStorage.getItem('paymentMethod')) : null` and include in initial `cart` state | 🔴 Not yet |
+| 5 | 🟡 MEDIUM | `backend/controllers/productController.js:49` + `backend/controllers/userController.js:122` | Mongoose `.remove()` method is deprecated since v5.0; will throw "document.remove is not a function" error when running against Mongoose 6+ | Replace `await product.remove()` with `await Product.deleteOne({ _id: product._id })` and `await user.remove()` with `await User.deleteOne({ _id: user._id })` | 🔴 Not yet |
+| 6 | 🟡 MEDIUM | `backend/controllers/productController.js:80–108` | `updateProduct` accepts `req.body` fields without validation; no checks for empty strings, invalid types, or negative prices | Add input validation: check name/brand/category non-empty, price >= 0, countInStock >= 0, description length > 0; return 400 if invalid | 🔴 Not yet |
+| 7 | 🟡 MEDIUM | `backend/controllers/productController.js:113–149` | `createProductReview` does not validate rating (should be 1–5) or comment length; accepts invalid data | Validate: `Number(rating) >= 1 && Number(rating) <= 5`, comment non-empty; throw 400 error if invalid before pushing review | 🔴 Not yet |
+| 8 | 🟡 MEDIUM | `backend/controllers/orderController.js:66–71` | `updateOrderToPaid` accesses `req.body.payer.email_address` without checking if `payer` object exists; will throw error if malformed PayPal response | Add safety check: `if (!req.body.payer) { res.status(400); throw new Error('Invalid PayPal response'); }` before accessing nested properties | 🔴 Not yet |
+| 9 | 🟡 MEDIUM | `backend/controllers/orderController.js:18–38` | `addOrderItems` has unreachable `return` statement after `throw` (line 21), and unnecessary `else` clause structure | Simplify: remove `return` after `throw`, flatten `if-else` to early-exit pattern: if orderItems empty, throw; else create order | 🔴 Not yet |
+| 10 | 🟢 COSMETIC | `frontend/src/screens/PaymentScreen.js:43–50` | Commented-out Stripe payment option (dead code); unclear if it's a TODO or abandoned feature | Either remove the block entirely or create an Issue ticket to track Stripe implementation scope | 🔴 Not yet |
+
+---
+
+## Summary
+
+**10 findings total:** 4 critical (blocks upgrades or breaks core UX), 5 medium (validation gaps, deprecated APIs), 1 cosmetic (dead code).
+
+**High-priority blockers:**
+- **PORT 5000** immediately breaks macOS development
+- **paymentMethod localStorage** breaks checkout on page refresh
+- **useCreateIndex** locks the project into Mongoose 5.x
+- **Mongoose 5.x age** creates growing security/compatibility debt
+
+**Next steps:** Address the 4 CRITICAL findings before merging new features. Medium-priority items can be batched into a refactor sprint.
