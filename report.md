@@ -55,3 +55,5 @@ Added to root `CLAUDE.md` to codify patterns and pitfalls:
   db.products.countDocuments() - Count total products
   db.users.find() - See all users
   db.orders.find() - See all orders
+
+Ran locally using Docker mongo and 'npm run dev'

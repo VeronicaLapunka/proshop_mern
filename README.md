@@ -1,127 +1,382 @@
-# ProShop eCommerce Platform
+# ProShop MERN eCommerce Platform
 
-> eCommerce platform built with the MERN stack & Redux.
+A full-stack eCommerce application built with MongoDB, Express.js, React, and Node.js. Users can browse products, write reviews, add items to cart, and complete purchases with PayPal integration. Admin users can manage products, users, and orders.
 
-### THIS PROJECT IS DEPRECATED
-This project is no longer supported. The new project/course has been released. The code has been cleaned up and now uses Redux Toolkit. You can find the new version [HERE](https://github.com/bradtraversy/proshop-v2)
+## ⚠️ Project Status
 
-![screenshot](https://github.com/bradtraversy/proshop_mern/blob/master/uploads/Screen%20Shot%202020-09-29%20at%205.50.52%20PM.png)
+This is a legacy/deprecated project created for educational purposes. It has been superseded by [ProShop v2](https://github.com/bradtraversy/proshop-v2) which uses Redux Toolkit. This version is maintained as-is for reference.
 
-## Features
+---
 
-- Full featured shopping cart
-- Product reviews and ratings
-- Top products carousel
-- Product pagination
-- Product search feature
-- User profile with orders
-- Admin product management
-- Admin user management
-- Admin Order details page
-- Mark orders as delivered option
-- Checkout process (shipping, payment method, etc)
-- PayPal / credit card integration
-- Database seeder (products & users)
+## Tech Stack
 
-## Note on Issues
-Please do not post issues here that are related to your own code when taking the course. Add those in the Udemy Q/A. If you clone THIS repo and there are issues, then you can submit
+### Backend
 
-## Usage
+- **Node.js** 14.6+ (ES Modules)
+- **Express.js** 4.17.1 — REST API
+- **Mongoose** 5.10.6 — MongoDB ODM
+- **jsonwebtoken** 8.5.1 — JWT authentication
+- **bcryptjs** 2.4.3 — Password hashing
+- **dotenv** 8.2.0 — Environment variable loading
+- **morgan** 1.10.0 — HTTP logging
+- **multer** 1.4.2 — File uploads
+- **express-async-handler** 1.1.4 — Async error handling
+- **concurrently** 5.3.0 — Run frontend + backend concurrently (dev)
+- **nodemon** 2.0.4 — Auto-restart on code changes (dev)
 
-### ES Modules in Node
+### Frontend
 
-We use ECMAScript Modules in the backend in this project. Be sure to have at least Node v14.6+ or you will need to add the "--experimental-modules" flag.
+- **React** 16.13.1 — UI framework
+- **Redux** 4.0.5 + **redux-thunk** 2.3.0 — State management
+- **React Router** 5.2.0 — Client-side routing
+- **Axios** 0.20.0 — HTTP client
+- **react-bootstrap** 1.3.0 — Bootstrap components
+- **react-paypal-button-v2** 2.6.2 — PayPal integration
+- **react-scripts** 3.4.3 — CRA build tooling
 
-Also, when importing a file (not a package), be sure to add .js at the end or you will get a "module not found" error
+---
 
-You can also install and setup Babel if you would like
-
-### Env Variables
-
-Create a .env file in then root and add the following
+## Project Structure
 
 ```
-NODE_ENV = development
-PORT = 5000
-MONGO_URI = your mongodb uri
-JWT_SECRET = 'abc123'
-PAYPAL_CLIENT_ID = your paypal client id
+proshop_mern/
+├── backend/
+│   ├── config/
+│   │   └── db.js                  # MongoDB connection setup
+│   ├── controllers/
+│   │   ├── productControllers.js
+│   │   ├── userControllers.js
+│   │   └── orderControllers.js    # Request handlers
+│   ├── middleware/
+│   │   ├── authMiddleware.js      # JWT verification
+│   │   └── errorMiddleware.js     # Error formatting
+│   ├── models/
+│   │   ├── productModel.js
+│   │   ├── userModel.js
+│   │   └── orderModel.js          # Mongoose schemas
+│   ├── routes/
+│   │   ├── productRoutes.js
+│   │   ├── userRoutes.js
+│   │   ├── orderRoutes.js
+│   │   └── uploadRoutes.js        # API endpoint definitions
+│   ├── data/
+│   │   ├── products.js
+│   │   └── users.js               # Sample data for seeding
+│   ├── utils/
+│   │   └── generateToken.js       # JWT creation
+│   ├── server.js                  # Express app initialization
+│   ├── seeder.js                  # Database seeding script
+│   ├── CLAUDE.md                  # Backend code guidelines
+│   └── package.json
+│
+├── frontend/
+│   ├── public/                    # Static files (favicon, index.html)
+│   ├── src/
+│   │   ├── actions/               # Redux action creators (async thunks)
+│   │   ├── reducers/              # Redux state reducers
+│   │   ├── components/            # Reusable UI components (Header, Footer, Rating, etc.)
+│   │   ├── screens/               # Full-page components (*Screen.js)
+│   │   ├── constants/             # Redux action type constants
+│   │   ├── App.js                 # Router and main layout
+│   │   ├── store.js               # Redux store initialization
+│   │   ├── index.js               # React entry point
+│   │   └── index.css
+│   ├── CLAUDE.md                  # Frontend code guidelines
+│   ├── package.json               # Frontend dependencies (includes proxy to backend)
+│   └── .env.local                 # Frontend-specific env vars (optional)
+│
+├── uploads/                       # User-uploaded product images (Multer output)
+├── .env                           # Backend environment variables (root)
+├── package.json                   # Root scripts (dev, data:import, data:destroy)
+├── CLAUDE.md                      # Project-wide guidance
+└── Procfile                       # Heroku deployment config
 ```
 
-### Install Dependencies (frontend & backend)
+---
 
+## Prerequisites
+
+### System Requirements
+
+- **Node.js** 14.6 or higher
+  - Check version: `node --version`
+  - **On Node 17+**: The frontend requires `NODE_OPTIONS=--openssl-legacy-provider` (already set in `frontend/package.json`, but needed if running `react-scripts` directly)
+
+- **MongoDB** (any version)
+  - **Option 1 (Local)**: Install from [mongodb.com/try/download](https://www.mongodb.com/try/download/community) or via Homebrew:
+    ```bash
+    brew install mongodb-community
+    brew services start mongodb-community
+    ```
+  - **Option 2 (Docker)**: If Docker is installed:
+    ```bash
+    docker run -d -p 27017:27017 --name mongo mongo:7
+    ```
+  - **Option 3 (MongoDB Atlas)**: Use a free cloud database at [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas) — get a connection URI and use it in `.env`
+
+### Verify MongoDB is Running
+
+```bash
+mongosh  # or 'mongo' for older MongoDB
+# Should connect without error. Type 'exit' to quit.
 ```
+
+- check it in Docker mongo in Exec tab
+
+---
+
+## Installation
+
+### 1. Clone and Install Root Dependencies
+
+```bash
+git clone https://github.com/bradtraversy/proshop_mern.git
+cd proshop_mern
 npm install
+```
+
+### 2. Install Frontend Dependencies
+
+```bash
 cd frontend
 npm install
+cd ..
 ```
 
-### Run
+### 3. Create `.env` File in Project Root
+
+Create a file named `.env` in the root directory (same level as `package.json`) with the following variables:
 
 ```
-# Run frontend (:3000) & backend (:5000)
+NODE_ENV=development
+PORT=5001
+MONGO_URI=mongodb://localhost:27017/proshop
+JWT_SECRET=your_secret_key_here_can_be_any_string
+PAYPAL_CLIENT_ID=sandbox
+```
+
+#### Environment Variable Reference
+
+| Variable           | Required | Default | Notes                                                                                                                        |
+| ------------------ | -------- | ------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`         | Yes      | —       | Set to `development` for dev (enables morgan logging); `production` for prod                                                 |
+| `PORT`             | No       | `5000`  | **Important**: Use `5001` on macOS (port 5000 is held by Control Center). Frontend proxy is set to `5001`                    |
+| `MONGO_URI`        | Yes      | —       | `mongodb://localhost:27017/proshop` for local; or MongoDB Atlas URI                                                          |
+| `JWT_SECRET`       | Yes      | —       | Any long random string; changes invalidate all sessions                                                                      |
+| `PAYPAL_CLIENT_ID` | Yes      | —       | Use `sandbox` for development; get a real client ID from [developer.paypal.com](https://developer.paypal.com) for production |
+
+### 4. Seed the Database (Optional)
+
+Load sample products and users:
+
+```bash
+npm run data:import
+```
+
+**Sample Login Credentials** (after seeding):
+
+- **Admin**: `admin@example.com` / `123456`
+- **Customer**: `john@example.com` / `123456`
+- **Customer**: `jane@example.com` / `123456`
+
+To wipe all data:
+
+```bash
+npm run data:destroy
+```
+
+---
+
+## Running the Application
+
+### Development Mode (Frontend + Backend Running Together)
+
+```bash
 npm run dev
+```
 
-# Run backend only
+This starts:
+
+- **Backend**: `http://localhost:5001` (Express API)
+- **Frontend**: `http://localhost:3000` (React dev server)
+
+The frontend proxy (in `frontend/package.json`) automatically routes `/api/*` calls to the backend.
+
+### Backend Only
+
+```bash
 npm run server
 ```
 
-## Build & Deploy
+Runs on `http://localhost:5001`. Useful for testing API endpoints with Postman or curl.
 
+### Frontend Only
+
+```bash
+npm run client
 ```
-# Create frontend prod build
+
+Runs on `http://localhost:3000`. Make sure the backend is running separately on port 5001.
+
+---
+
+## Building for Production
+
+### Create a Frontend Production Build
+
+```bash
 cd frontend
 npm run build
 ```
 
-There is a Heroku postbuild script, so if you push to Heroku, no need to build manually for deployment to Heroku
+Creates an optimized bundle in `frontend/build/`. The backend will serve this on startup if `NODE_ENV=production`.
 
-### Seed Database
+### Test Production Build Locally
 
-You can use the following commands to seed the database with some sample users and products as well as destroy all data
-
-```
-# Import data
-npm run data:import
-
-# Destroy data
-npm run data:destroy
+```bash
+npm run build --prefix frontend
+npm start
 ```
 
+Then open `http://localhost:5001`. The backend serves the frontend build from `/` and the API from `/api/`.
+
+---
+
+## Troubleshooting
+
+### MongoDB Connection Fails Immediately
+
+**Error**: `Error: ECONNREFUSED` or `MongoDB connection error`
+
+**Solution**:
+
+- Verify MongoDB is running: `mongosh` (or `mongo`)
+- Check `MONGO_URI` in `.env` is correct
+- If using MongoDB Atlas, ensure your IP is whitelisted in Atlas network settings
+- The app has no retry logic — it exits immediately if it can't connect
+
+### Frontend Shows "Network Error" / `ECONNREFUSED` on API Calls
+
+**Error**: All `/api/` requests fail immediately
+
+**Likely causes**:
+
+1. **Backend not running** — run `npm run server` in a separate terminal
+2. **Port mismatch** — verify `.env` has `PORT=5001` and `frontend/package.json` has `"proxy": "http://127.0.0.1:5001"`
+3. **Proxy not picked up** — restart the dev server: stop and re-run `npm run dev`
+
+### Port 5001 Already in Use
+
+**Error**: `Error: listen EADDRINUSE :::5001`
+
+**Solution**:
+
+- Find what's using the port: `lsof -i :5001` (macOS/Linux)
+- Kill the process: `kill -9 <PID>`
+- Or change `PORT` in `.env` to something else (e.g., `5002`) and update `frontend/package.json` proxy to match
+
+### Port 5000 Always Fails on macOS
+
+**Issue**: Port 5000 is permanently held by macOS Control Center
+
+**Solution**: Use `PORT=5001` in `.env` (already recommended above)
+
+### React App Won't Start / "react-scripts: command not found"
+
+**Error**: `react-scripts not found` when running `npm run dev`
+
+**Solution**:
+
+```bash
+cd frontend
+npm install
+cd ..
+npm run dev
 ```
-Sample User Logins
 
-admin@example.com (Admin)
-123456
+### OpenSSL Error on Node 17+ (Frontend Build Fails)
 
-john@example.com (Customer)
-123456
+**Error**: `error:0308010C:digital envelope routines::unsupported`
 
-jane@example.com (Customer)
-123456
+**Solution**: This is already handled in `frontend/package.json` with `NODE_OPTIONS=--openssl-legacy-provider` in the `start` and `build` scripts. If still failing:
+
+- Restart the dev server
+- Clear node_modules and reinstall: `cd frontend && rm -rf node_modules && npm install`
+
+### PayPal Sandbox Button Not Working
+
+**Error**: "PayPal button does not appear" or "Invalid client ID"
+
+**Cause**: `PAYPAL_CLIENT_ID` is not set or is set to `sandbox` (a placeholder)
+
+**Solution**:
+
+1. Go to [developer.paypal.com](https://developer.paypal.com)
+2. Log in with your PayPal account (or create one)
+3. Create a Sandbox business account
+4. Get your **Sandbox Client ID**
+5. Set `PAYPAL_CLIENT_ID=<your_sandbox_client_id>` in `.env`
+6. Restart the backend: stop and run `npm run server`
+
+For production, use a real client ID.
+
+### Uploaded Product Images Not Showing
+
+**Issue**: Image upload succeeds, but images don't display on the site
+
+**Causes & Solutions**:
+
+- Check that `uploads/` folder exists (created automatically on first upload)
+- Verify backend is serving `/uploads/` static route: `http://localhost:5001/uploads/<filename>` should return the file
+- On production with ephemeral storage (Heroku, Docker, AWS Lambda), uploaded files are lost on restart — replace Multer with cloud storage (S3, Cloudinary)
+
+### "Not authorized, token failed" Error After Logout
+
+**Issue**: Logged-in user suddenly sees "Not authorized, token failed" and is logged out
+
+**Normal behavior**: JWT token expires after 30 days, or was manually cleared from localStorage. To stay logged in indefinitely:
+
+- Edit `backend/utils/generateToken.js` and increase the `expiresIn` value (currently `'30d'`)
+- Or implement token refresh logic (not included in this version)
+
+---
+
+## Common Commands Reference
+
+```bash
+# Development
+npm run dev              # Start frontend + backend concurrently
+npm run server           # Start backend only
+npm run client           # Start frontend only
+
+# Database
+npm run data:import      # Seed database with sample data
+npm run data:destroy     # Wipe all database data
+
+# Production
+npm run build --prefix frontend   # Build frontend for production
+npm start                         # Start backend in production mode (serves frontend)
 ```
 
+---
+
+## Key Implementation Notes
+
+- **No CORS middleware**: In development, the frontend proxy handles cross-origin requests. In production, both frontend and backend run on the same origin.
+- **JWT in localStorage**: The token is stored in browser localStorage (XSS-readable). For higher security, use httpOnly cookies (requires backend changes).
+- **File uploads to disk**: Multer saves files to the `uploads/` folder. In production with ephemeral filesystems, use cloud storage.
+- **ES Modules**: All backend imports require `.js` file extension (e.g., `import connectDB from './config/db.js'`)
+
+---
+
+## Additional Resources
+
+- Backend code guidelines: See [backend/CLAUDE.md](backend/CLAUDE.md)
+- Frontend code guidelines: See [frontend/CLAUDE.md](frontend/CLAUDE.md)
+- Project guidelines: See [CLAUDE.md](CLAUDE.md)
+
+---
 
 ## License
 
-The MIT License
-
-Copyright (c) 2020 Traversy Media https://traversymedia.com
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+MIT License © 2020 Traversy Media
