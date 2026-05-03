@@ -10,6 +10,8 @@ This is a legacy/deprecated project created for educational purposes. It has bee
 
 ## Tech Stack
 
+TypeScript SDK + Zod
+
 ### Backend
 
 - **Node.js** 14.6+ (ES Modules)
