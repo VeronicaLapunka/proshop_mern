@@ -2,6 +2,7 @@ import express from 'express'
 import fs from 'fs/promises'
 import path from 'path'
 import asyncHandler from 'express-async-handler'
+import { protect, admin } from '../middleware/authMiddleware.js'
 
 const router = express.Router()
 
@@ -9,8 +10,8 @@ const featuresFilePath = path.join(path.resolve(), 'features.json')
 
 // @desc    Get all feature flags
 // @route   GET /api/feature-flags
-// @access  Public
-router.get('/', asyncHandler(async (req, res) => {
+// @access  Private/Admin
+router.get('/', protect, admin, asyncHandler(async (req, res) => {
   const raw = await fs.readFile(featuresFilePath, 'utf-8')
   res.json(JSON.parse(raw))
 }))

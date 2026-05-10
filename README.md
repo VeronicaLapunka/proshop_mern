@@ -224,28 +224,49 @@ Runs on `http://localhost:3000`. Make sure the backend is running separately on 
 
 ---
 
-## Feature Flags API
+## Feature Flags
 
 Feature flags are defined in [`features.json`](./features.json) at the project root. The backend reads this file on **every request** (no caching), so changes made by the MCP Feature Flags server are immediately visible without restarting the backend.
 
-### Endpoints
+### Admin Dashboard (UI)
 
-| Method | Endpoint                        | Description                        |
-| ------ | ------------------------------- | ---------------------------------- |
-| GET    | `/api/feature-flags`            | Returns all feature flags as JSON  |
-| GET    | `/api/feature-flags/:name`      | Returns a single flag by key name  |
+After seeding the database and starting the app, log in as admin and navigate to:
 
-### Verify in Browser or curl
-
-```bash
-# All flags
-curl http://localhost:5001/api/feature-flags
-
-# Single flag
-curl http://localhost:5001/api/feature-flags/dark_mode
+```
+http://localhost:3000/admin/features
 ```
 
-Or open `http://localhost:5001/api/feature-flags` directly in a browser while `npm run dev` (or `npm run server`) is running.
+Or use the **Admin → Feature Flags** link in the top navigation bar.
+
+**Admin credentials** (requires `npm run data:import` first):
+- Email: `admin@example.com`
+- Password: `123456`
+
+The dashboard shows all 25 feature flags in a table: name, status, traffic %, last modified, dependencies, and description. Data is fetched live from `GET /api/feature-flags` on every page load.
+
+### API Endpoints
+
+| Method | Endpoint                   | Access        | Description                       |
+| ------ | -------------------------- | ------------- | --------------------------------- |
+| GET    | `/api/feature-flags`       | Private/Admin | Returns all feature flags as JSON |
+| GET    | `/api/feature-flags/:name` | Private/Admin | Returns a single flag by key name |
+
+Both endpoints require a valid JWT token with `isAdmin: true`. Pass the token in the `Authorization: Bearer <token>` header.
+
+### Verify via curl (authenticated)
+
+```bash
+# 1. Log in to get a token
+TOKEN=$(curl -s -X POST http://localhost:5001/api/users/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"123456"}' | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
+
+# 2. Fetch all flags
+curl http://localhost:5001/api/feature-flags -H "Authorization: Bearer $TOKEN"
+
+# 3. Fetch a single flag
+curl http://localhost:5001/api/feature-flags/dark_mode -H "Authorization: Bearer $TOKEN"
+```
 
 ### Updating Flags via MCP Server
 
