@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "feature-flags": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["tsx", "${workspaceFolder}/mcp-feature-flags/src/server.ts"]
+    }
+  }
+}

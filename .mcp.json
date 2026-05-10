@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "feature-flags": {
+      "type": "stdio",
+      "command": "/usr/local/opt/node@22/bin/node",
+      "args": [
+        "/Users/Veronica_Lapunka/Documents/git3/proshop_mern/mcp-feature-flags/node_modules/.bin/tsx",
+        "/Users/Veronica_Lapunka/Documents/git3/proshop_mern/mcp-feature-flags/src/server.ts"
+      ]
+    }
+  }
+}
