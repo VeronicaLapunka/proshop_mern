@@ -60,7 +60,8 @@ proshop_mern/
 │   │   ├── productRoutes.js
 │   │   ├── userRoutes.js
 │   │   ├── orderRoutes.js
-│   │   └── uploadRoutes.js        # API endpoint definitions
+│   │   ├── uploadRoutes.js        # API endpoint definitions
+│   │   └── featureFlagRoutes.js   # GET /api/feature-flags (reads features.json live)
 │   ├── data/
 │   │   ├── products.js
 │   │   └── users.js               # Sample data for seeding
@@ -88,6 +89,7 @@ proshop_mern/
 │   └── .env.local                 # Frontend-specific env vars (optional)
 │
 ├── uploads/                       # User-uploaded product images (Multer output)
+├── features.json                  # Feature flag definitions — read live by /api/feature-flags
 ├── .env                           # Backend environment variables (root)
 ├── package.json                   # Root scripts (dev, data:import, data:destroy)
 ├── CLAUDE.md                      # Project-wide guidance
@@ -219,6 +221,42 @@ npm run client
 ```
 
 Runs on `http://localhost:3000`. Make sure the backend is running separately on port 5001.
+
+---
+
+## Feature Flags API
+
+Feature flags are defined in [`features.json`](./features.json) at the project root. The backend reads this file on **every request** (no caching), so changes made by the MCP Feature Flags server are immediately visible without restarting the backend.
+
+### Endpoints
+
+| Method | Endpoint                        | Description                        |
+| ------ | ------------------------------- | ---------------------------------- |
+| GET    | `/api/feature-flags`            | Returns all feature flags as JSON  |
+| GET    | `/api/feature-flags/:name`      | Returns a single flag by key name  |
+
+### Verify in Browser or curl
+
+```bash
+# All flags
+curl http://localhost:5001/api/feature-flags
+
+# Single flag
+curl http://localhost:5001/api/feature-flags/dark_mode
+```
+
+Or open `http://localhost:5001/api/feature-flags` directly in a browser while `npm run dev` (or `npm run server`) is running.
+
+### Updating Flags via MCP Server
+
+Start the MCP Feature Flags server in a separate terminal:
+
+```bash
+cd mcp-feature-flags
+npm run dev
+```
+
+Any changes applied through the MCP server write back to `features.json`. The next request to `/api/feature-flags` will reflect the updated state automatically.
 
 ---
 
