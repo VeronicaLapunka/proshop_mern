@@ -110,6 +110,21 @@ PAYPAL_CLIENT_ID = your_paypal_client_id
 - JWT stored in `localStorage` (XSS-readable). Expires in 30 days.
 - Auto-logout matches exact string `'Not authorized, token failed'` — renaming it silently breaks logout.
 
+## Поиск по документации продукта proshop_mern (search-docs MCP)
+
+- При любых вопросах про функционал, фичи, архитектуру, ADR, runbooks, incidents — **СНАЧАЛА** вызывать `search_project_docs` (MCP `docs-search`).
+- Это быстрее и возвращает релевантные чанки с метаданными (source_file, score, snippet).
+- Fallback на grep+read **только если**:
+  - vector search не дал нужных результатов (все score < 0.6), или
+  - нужно полное содержимое конкретного файла из метаданных найденного чанка.
+- **Никогда не начинать с grep+read по проекту** — медленно и дорого по токенам.
+
+## Управление feature flags (feature-flags MCP)
+
+- **Статус фичи** ("какой статус у gift_message?", "включена ли search_v2?") → вызывать `get_feature_info`. Не читать `backend/features.json` напрямую.
+- **Изменение статуса** ("включи фичу X", "переведи Y в Testing", "поставь трафик 25%") → вызывать `set_feature_state` / `adjust_traffic_rollout`. **Никогда не редактировать `backend/features.json` вручную через Edit/Write.**
+- **Список всех фич** → вызывать `list_features`. Не grep'ать файл.
+
 ## After Running Commands
 
 When running any command, Claude Code will summarize:
