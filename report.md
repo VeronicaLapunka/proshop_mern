@@ -153,6 +153,324 @@ args: { "feature_id": "search_v2" }
 
 ---
 
+### Search-docs MCP
+
+Три вопроса прогнаны через `mcp__docs-search__search_project_docs`. Каждый запрос — параллельно или в уточняющем раунде.
+
+---
+
+#### Q1: Какая БД используется и почему?
+
+**Раунд 1** — `query: "database MongoDB why chosen architecture decision"`, top_k=5
+
+| # | score | source_file | parent_headings | snippet |
+|---|-------|-------------|-----------------|---------|
+| 1 | 0.586 | best-practices.md | RTK Query vs. TanStack Query | RTK Query ~40KB vs TanStack ~16KB — architectural decision |
+| 2 | 0.577 | dev-history.md | Decision 1: MongoDB over PostgreSQL | "Made in January 2023 before the first commit. The rationale: the product catalog has variable attributes (electronics have wattage/voltage, clothing has…" |
+| 3 | 0.557 | best-practices.md | Embed vs. reference | Unbounded arrays embedded — common production failure |
+| 4 | 0.550 | dev-history.md | Decision 4: Staying on Bootstrap 4 | Bootstrap 4 chosen in January 2023 |
+| 5 | 0.545 | architecture.md | System Overview | ProShop — MERN stack (MongoDB, Express, React, Node) |
+
+Чанк #2 релевантен (dev-history.md, Decision 1), но score 0.577 — слабо. Уточнение:
+
+**Раунд 2** — `query: "MongoDB chosen rationale flexible schema document store"`, top_k=3
+
+| # | score | source_file | parent_headings | snippet |
+|---|-------|-------------|-----------------|---------|
+| 1 | **0.727** | dev-history.md | Decision 1: MongoDB over PostgreSQL | "Made in January 2023 before the first commit. The rationale: the product catalog has variable attributes (electronics have wattage/voltage, clothing has…" |
+| 2 | 0.634 | architecture.md | 5.4 Mongoose Models | "See Section 6 for full schema detail." |
+| 3 | 0.627 | glossary.md | Mongoose | "ODM for MongoDB in Node.js. Provides schema validation, type coercion, and middleware hooks." |
+
+**Ответ:** БД — **MongoDB**. Выбрана в январе 2023 вместо PostgreSQL по причине переменных атрибутов товаров (электроника: wattage/voltage, одежда: размеры/цвета) — гибкая документная схема подходит лучше реляционной таблицы. Чанк из `dev-history.md` → Decision 1 — прямой ADR-ответ, score 0.727.
+
+---
+
+#### Q2: Какие фичи зависят от search_v2?
+
+**Раунд 1** — `query: "search_v2 feature dependencies features that depend on"`, top_k=5
+
+| # | score | source_file | parent_headings | snippet |
+|---|-------|-------------|-----------------|---------|
+| 1 | 0.677 | feature-flags-spec.md | Avoiding Flag Dependency Chains | "Each dependency listed in a flag's array adds a constraint that must be managed manually. Deep chains — where flag C depends on B, which depends on A…" |
+| 2 | 0.645 | feature-flags-spec.md | Tool 2: set_feature_state | Purpose: Change the state of a feature flag. Automatically adjusts traffic… |
+| 3 | 0.637 | feature-flags-spec.md | 4. Feature Flag Catalog | "This section describes all 25 feature flags defined in…" |
+| 4 | 0.622 | feature-flags-spec.md | Tool 1: get_feature_info | "Retrieve the complete current state of a single feature flag." |
+| 5 | 0.620 | feature-flags-spec.md | 2. The features.json Format | "The file contains a single top-level JSON object. Each key is a feature ID…" |
+
+**Раунд 2** — `query: "search_v2 flag catalog dependencies enabled"`, top_k=5
+
+| # | score | source_file | parent_headings | snippet |
+|---|-------|-------------|-----------------|---------|
+| 1 | 0.684 | feature-flags-spec.md | Avoiding Flag Dependency Chains | "Each dependency listed… Deep chains…" |
+| 2 | 0.670 | feature-flag-toggle.md | Reference Commands | "Last updated: M3 curriculum." |
+| 3 | 0.659 | feature-flags-spec.md | 4. Feature Flag Catalog | "This section describes all 25 feature flags…" |
+| 4 | 0.647 | feature-flags-spec.md | What Are Feature Flags? | "A feature flag lets you turn functionality on or off without deploying…" |
+| 5 | 0.639 | best-practices.md | OpenFeature | CNCF vendor-neutral standard… |
+
+**Вывод:** Оба раунда вернули общие секции про dependency chains и инструменты, но ни один чанк не содержит конкретного перечня флагов, зависящих от `search_v2`. Corpus проиндексирован по chunk'ам заголовков — каталог флагов попал в один крупный чанк без детализации по зависимостям. Max score 0.684 — ниже порога уверенного ответа.
+
+**Fallback:** прямой ответ требует чтения `feature-flags-spec.md` или вызова `get_feature_info` + `list_features` через feature-flags MCP. По данным предыдущего прогона (лог ниже в report.md) зависимым флагом является **`semantic_search`** (extends search_v2 с embedding-based retrieval), но vector search это в текущей сессии не подтвердил.
+
+---
+
+#### Q3: Что случилось во время последнего incident с checkout?
+
+**Раунд 1** — `query: "checkout incident bug production issue"`, top_k=5
+
+| # | score | source_file | parent_headings | snippet |
+|---|-------|-------------|-----------------|---------|
+| 1 | 0.680 | feature-flags-spec.md | guest_checkout — Guest Checkout Without Registration | "Unauthenticated users can complete a purchase without creating an account. A temporary guest session token is issued at checkout entry…" |
+| 2 | 0.679 | incident-response.md | Phase 7: Post-Incident / Action Items | "Create a Jira/GitHub issue for each action item. Review in weekly standup until resolved." |
+| 3 | 0.663 | feature-flags-spec.md | express_checkout — Express One-Click Checkout | "Authenticated users who have previously completed an order see a 'Buy Now' button…" |
+| 4 | 0.660 | glossary.md | Cart Abandonment Rate | "Percentage of shopping carts created but not converted to orders. Indicates friction in checkout…" |
+| 5 | 0.659 | i-001-paypal-double-charge.md | Lessons | "PayPal sandbox does not faithfully replicate production behavior. Double-callback occurs in sandbox due to retry logic…" |
+
+Инцидент виден на #5, но заглушён feature-flags и glossary. Уточнение:
+
+**Раунд 2** — `query: "PayPal double charge checkout incident root cause fix"`, top_k=5
+
+| # | score | source_file | parent_headings | snippet |
+|---|-------|-------------|-----------------|---------|
+| 1 | **0.715** | i-001-paypal-double-charge.md | Summary | "A subset of orders placed via PayPal were being marked as paid twice in the database, resulting in duplicate documents and — in three cases — inventory being decremented twice for the same…" |
+| 2 | **0.708** | i-001-paypal-double-charge.md | Impact | "Orders affected: 7 orders with duplicate entries. Inventory: 3 products with stock decremented below true value (including one at -1). Customer impact: Zero." |
+| 3 | 0.659 | feature-flags-spec.md | guest_checkout | Guest session token issued at checkout entry… |
+| 4 | 0.654 | i-001-paypal-double-charge.md | Root Cause Analysis | "The SDK fires the callback when PayPal confirms payment authorization. The application's handler called PUT /api/orders/:id/pay. The backend handler at that time: No idempotency guard…" |
+| 5 | 0.646 | best-practices.md | 5.6 Double-charge prevention at the order level | "Add a database-level guard: an order can only transition to paid state once. Implement with a Mongoose status field and an atomic update…" |
+
+**Ответ:** Последний инцидент — **i-001: PayPal Sandbox Webhook Double-Charge**.
+
+- **Что случилось:** PayPal SDK дважды вызывал `onApprove` callback (sandbox retry logic). Каждый вызов делал PUT `/api/orders/:id/pay`. Бэкенд не имел idempotency guard → 7 заказов помечены как оплаченные дважды, у 3 товаров остаток запасов ушёл в минус (один до -1).
+- **Клиентский ущерб:** нулевой (sandbox-среда).
+- **Фикс:** добавить DB-level guard — заказ может перейти в `paid` только один раз (Mongoose atomicUpdate + статусная проверка перед обновлением).
+- **Урок:** sandbox PayPal воспроизводит retry-поведение, которого нет в production → тестировать idempotency отдельно.
+
+Источники: три чанка из `i-001-paypal-double-charge.md` (score 0.715 / 0.708 / 0.654) + `best-practices.md` §5.6.
+
+---
+
+#### Итоги по трём вопросам
+
+| Вопрос | Нашёл MCP? | Max score | Fallback нужен? |
+|--------|-----------|-----------|-----------------|
+| Q1: Какая БД и почему? | ✅ Да (dev-history.md, Decision 1) | 0.727 | Нет |
+| Q2: Зависимости search_v2 | ❌ Нет прямого ответа | 0.684 | Да → читать feature-flags-spec.md или list_features |
+| Q3: Последний инцидент checkout | ✅ Да (i-001-paypal-double-charge.md) | 0.715 | Нет |
+
+**Вывод:** уточнение запроса (раунд 2) критично — первый запрос по Q1 дал 0.577, после перефразирования 0.727. Q2 упирается в структуру чанкинга: весь каталог флагов попал в один большой чанк без раскрытия зависимостей → vector search не справляется, нужен fallback на live feature-flags MCP.
+
+---
+
+### End-to-end
+
+Цепочка из 5 tool calls: 2 × search-docs MCP + 3 × feature-flags MCP.
+
+---
+
+#### Tool call 1 — search-docs: первый запрос
+
+```
+tool: mcp__docs-search__search_project_docs
+args: { "query": "semantic_search feature description dependencies what it does", "top_k": 5 }
+```
+
+| # | score | source_file | parent_headings | snippet |
+|---|-------|-------------|-----------------|---------|
+| 1 | 0.685 | feature-flags-spec.md | Avoiding Flag Dependency Chains | "Each dependency listed in a flag's array adds a constraint that must be managed manually…" |
+| 2 | 0.660 | feature-flags-spec.md | Tool 1: get_feature_info | "Purpose: Retrieve the complete current state of a single feature flag." |
+| 3 | **0.657** | feature-flags-spec.md | `semantic_search` — Semantic Vector Search | "Extends search_v2 with embedding-based retrieval. Product embeddings are pre-computed and stored; at query time, the user's search string is embedded and…" |
+| 4 | 0.643 | feature-flags-spec.md | 2. The features.json Format | "The file contains a single top-level JSON object." |
+| 5 | 0.632 | feature-flags-spec.md | 4. Feature Flag Catalog | "This section describes all 25 feature flags…" |
+
+Чанк #3 содержит нужный раздел каталога, но score 0.657 — неуверенно. Уточнение:
+
+---
+
+#### Tool call 2 — search-docs: уточняющий запрос
+
+```
+tool: mcp__docs-search__search_project_docs
+args: { "query": "semantic_search embedding vector retrieval product search rollout", "top_k": 3 }
+```
+
+| # | score | source_file | parent_headings | snippet |
+|---|-------|-------------|-----------------|---------|
+| 1 | **0.743** | feature-flags-spec.md | `semantic_search` — Semantic Vector Search | "Extends search_v2 with embedding-based retrieval. Product embeddings are pre-computed and stored; at query time, the user's search string is embedded and…" |
+| 2 | 0.642 | feature-flags-spec.md | `search_v2` — New Search Algorithm | "The current product search uses MongoDB regex on the product name field only. search_v2 replaces this with a hybrid BM25 + TF-IDF ranking pipeline…" |
+| 3 | 0.633 | home.md | User Actions | "Search: Triggered from Header…" |
+
+Чанк #1 — точное попадание (score 0.743). Из документации:
+
+> **`semantic_search` — Semantic Vector Search**
+> Default state: Disabled
+> Extends `search_v2` with embedding-based retrieval. Product embeddings are pre-computed and stored; at query time, the user's search string is embedded and matched via cosine similarity.
+
+**Зависимости:** `search_v2` (явно указана в чанке и подтверждена live MCP).
+
+---
+
+#### Tool call 3 — feature-flags: get_feature_info (начальное состояние)
+
+```
+tool: mcp__feature-flags__get_feature_info
+args: { "feature_id": "semantic_search" }
+```
+
+Ответ:
+
+```json
+{
+  "feature_id": "semantic_search",
+  "name": "Semantic Vector Search",
+  "description": "Augments keyword search with embedding-based semantic similarity. Products are encoded at index time; queries are embedded at runtime and matched via cosine similarity. Requires search_v2 to be Enabled first. Significantly improves discovery for natural-language queries like 'good headphones for running'.",
+  "status": "Disabled",
+  "traffic_percentage": 0,
+  "last_modified": "2026-02-14",
+  "targeted_segments": ["internal"],
+  "rollout_strategy": "canary",
+  "dependencies": ["search_v2"],
+  "dependency_states": { "search_v2": "Testing" }
+}
+```
+
+**Проверка условия:**
+- `semantic_search.status` = `Disabled` ✅
+- `search_v2` (зависимость) = `Testing` ≠ `Disabled` ✅
+
+Условие выполнено → переводим в Testing, устанавливаем трафик 25%.
+
+---
+
+#### Tool call 4 — feature-flags: set_feature_state → Testing
+
+```
+tool: mcp__feature-flags__set_feature_state
+args: { "feature_id": "semantic_search", "state": "Testing" }
+```
+
+Ответ:
+
+```json
+{
+  "feature_id": "semantic_search",
+  "name": "Semantic Vector Search",
+  "status": "Testing",
+  "traffic_percentage": 10,
+  "last_modified": "2026-05-11",
+  "warnings": [
+    "Dependency 'search_v2' is 'Testing', not 'Enabled'. 'semantic_search' may not function correctly."
+  ]
+}
+```
+
+Статус → Testing. Трафик автоматически установлен в 10 (дефолт для Testing при предыдущем значении 0). Предупреждение: `search_v2` в Testing, не Enabled — не блокирует, но означает частичную доступность.
+
+---
+
+#### Tool call 5 — feature-flags: adjust_traffic_rollout → 25%
+
+```
+tool: mcp__feature-flags__adjust_traffic_rollout
+args: { "feature_id": "semantic_search", "percentage": 25 }
+```
+
+Ответ:
+
+```json
+{
+  "feature_id": "semantic_search",
+  "name": "Semantic Vector Search",
+  "status": "Testing",
+  "traffic_percentage": 25,
+  "last_modified": "2026-05-11",
+  "hint": null
+}
+```
+
+---
+
+#### Tool call 6 — feature-flags: get_feature_info (подтверждение)
+
+```
+tool: mcp__feature-flags__get_feature_info
+args: { "feature_id": "semantic_search" }
+```
+
+```json
+{
+  "feature_id": "semantic_search",
+  "status": "Testing",
+  "traffic_percentage": 25,
+  "last_modified": "2026-05-11",
+  "dependencies": ["search_v2"],
+  "dependency_states": { "search_v2": "Testing" }
+}
+```
+
+---
+
+#### Анализ цепочки: ожидаемая vs фактическая
+
+**Ожидаемая цепочка:**
+```
+search_project_docs → get_feature_info → анализ зависимостей →
+set_feature_state → adjust_traffic_rollout → get_feature_info → цитата
+```
+
+**Фактическая цепочка:**
+```
+Round 1:  search_project_docs("semantic_search feature description...")
+          + ToolSearch("get_feature_info")       ← параллельно (загрузка схемы)
+
+Round 2:  search_project_docs("semantic_search embedding vector...")  ← уточняющий, 2-й вызов
+          + get_feature_info("semantic_search")   ← параллельно с поиском (!)
+
+Round 3:  [анализ зависимостей — внутренний, не tool call]
+
+Round 4:  ToolSearch("set_feature_state")         ← загрузка схемы, не в expected
+Round 5:  set_feature_state → Testing
+
+Round 6:  ToolSearch("adjust_traffic_rollout")    ← загрузка схемы, не в expected
+Round 7:  adjust_traffic_rollout → 25%
+
+Round 8:  get_feature_info("semantic_search")     ← подтверждение ✅
+Round 9:  [цитата из контекста чанков, без доп. tool call] ✅
+```
+
+**Отклонения от ожидаемой цепочки:**
+
+| # | Отклонение | Причина | Влияние |
+|---|-----------|---------|---------|
+| 1 | `search_project_docs` вызван **дважды** (уточняющий раунд) | Score 0.657 в первом раунде — агент решил уточнить запрос | Полезно, но не в expected |
+| 2 | `get_feature_info` вызван **параллельно** с search round 2, а не после него | Оптимизация: оба независимы по входным данным | Порядок нарушен, результат тот же |
+| 3 | **3 × ToolSearch** (загрузка схем) как дополнительные шаги | Deferred tools — схемы не загружены заранее | Артефакт архитектуры системы, не семантическое отклонение |
+| 4 | Цитата взята **из кэша контекста**, не отдельным tool call | Чанки уже были в памяти после search раундов | Корректно, экономит токены |
+
+**Ключевое отклонение:** `get_feature_info` вызван **до завершения анализа документации** — параллельно с уточняющим search. Агент не дождался полного понимания зависимостей из доков перед проверкой live-статуса. В данном случае безопасно (доки и live-данные совпали), но в более сложном сценарии (скрытые зависимости только в документации) это могло привести к ошибке — агент мог бы начать менять статус флага, не зная всех ограничений.
+
+---
+
+#### Итоговое состояние
+
+| Поле | До | После |
+|------|----|-------|
+| status | Disabled | **Testing** |
+| traffic_percentage | 0% | **25%** |
+| last_modified | 2026-02-14 | 2026-05-11 |
+
+---
+
+#### Цитата из документации (зачем нужна фича)
+
+> *"Augments keyword search with embedding-based semantic similarity. Products are encoded at index time; queries are embedded at runtime and matched via cosine similarity. Requires `search_v2` to be Enabled first. **Significantly improves discovery for natural-language queries like 'good headphones for running'**."*
+>
+> — `feature-flags-spec.md` → Feature Flag Catalog → Search & Discovery → `semantic_search`
+
+**Главный вывод:** Фича нужна для того, чтобы пользователи могли искать товары на естественном языке, а не точными ключевыми словами. Без неё поиск работает только по точному совпадению с именем товара (MongoDB regex). С ней — по семантической близости embeddings, что кардинально улучшает discovery.
+
+**Предупреждение MCP:** пока `search_v2` в Testing (а не Enabled), `semantic_search` может работать некорректно. Для полной активации нужно сначала промоутировать `search_v2` → Enabled.
+
+---
+
 ## HW3: Vector DB Chunking Pipeline
 
 ### Qdrant

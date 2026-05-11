@@ -114,6 +114,7 @@ PAYPAL_CLIENT_ID = your_paypal_client_id
 
 - При любых вопросах про функционал, фичи, архитектуру, ADR, runbooks, incidents — **СНАЧАЛА** вызывать `search_project_docs` (MCP `docs-search`).
 - Это быстрее и возвращает релевантные чанки с метаданными (source_file, score, snippet).
+- При end-to-end цепочках (search-docs + feature-flags) — сначала ПОЛНОСТЬЮ завершить все `search_project_docs` вызовы и проанализировать зависимости из доков, ТОЛЬКО ПОТОМ вызывать feature-flags MCP tools. Не параллелизировать search и `get_feature_info`.
 - Fallback на grep+read **только если**:
   - vector search не дал нужных результатов (все score < 0.6), или
   - нужно полное содержимое конкретного файла из метаданных найденного чанка.
