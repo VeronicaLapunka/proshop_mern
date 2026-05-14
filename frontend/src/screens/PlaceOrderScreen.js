@@ -1,12 +1,31 @@
 import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import Message from '../components/Message'
 import CheckoutSteps from '../components/CheckoutSteps'
 import { createOrder } from '../actions/orderActions'
 import { ORDER_CREATE_RESET } from '../constants/orderConstants'
 import { USER_DETAILS_RESET } from '../constants/userConstants'
+import './screens.css'
+
+/*
+  ASCII wireframe (ANTI_SLOP):
+  [Step 1 ✓] [Step 2 ✓] [Step 3 ✓] [Step 4: Place Order ●]
+  ─────────────────────────────────────── 48px gap
+  ┌─────────────────────────────────┬──────────────────────┐
+  │  Shipping                       │  Order Summary       │
+  │  123 Main St, City 12345, US    │  Items:   $xx.xx     │
+  │  ─────────────────────────────  │  Shipping: $xx.xx    │
+  │  Payment Method                 │  Tax:      $xx.xx    │
+  │  PayPal                         │  ─────────────────   │
+  │  ─────────────────────────────  │  Total:   $xx.xx     │
+  │  Order Items                    │  ─────────────────   │
+  │  [img] Name          N×$p=$x    │  [Place Order ─────] │
+  │  [img] Name          N×$p=$x    │                      │
+  └─────────────────────────────────┴──────────────────────┘
+
+  User journey: buyer with cart + shipping + payment → review → Place Order
+  Primary CTA: Place Order button
+*/
 
 const PlaceOrderScreen = ({ history }) => {
   const dispatch = useDispatch()
@@ -18,17 +37,14 @@ const PlaceOrderScreen = ({ history }) => {
   } else if (!cart.paymentMethod) {
     history.push('/payment')
   }
-  //   Calculate prices
-  const addDecimals = (num) => {
-    return (Math.round(num * 100) / 100).toFixed(2)
-  }
 
-  cart.itemsPrice = addDecimals(
-    cart.cartItems.reduce((acc, item) => acc + item.price * item.qty, 0)
-  )
+  // Calculate prices
+  const addDecimals = (num) => (Math.round(num * 100) / 100).toFixed(2)
+
+  cart.itemsPrice    = addDecimals(cart.cartItems.reduce((acc, item) => acc + item.price * item.qty, 0))
   cart.shippingPrice = addDecimals(cart.itemsPrice > 100 ? 0 : 100)
-  cart.taxPrice = addDecimals(Number((0.15 * cart.itemsPrice).toFixed(2)))
-  cart.totalPrice = (
+  cart.taxPrice      = addDecimals(Number((0.15 * cart.itemsPrice).toFixed(2)))
+  cart.totalPrice    = (
     Number(cart.itemsPrice) +
     Number(cart.shippingPrice) +
     Number(cart.taxPrice)
@@ -49,13 +65,13 @@ const PlaceOrderScreen = ({ history }) => {
   const placeOrderHandler = () => {
     dispatch(
       createOrder({
-        orderItems: cart.cartItems,
+        orderItems:      cart.cartItems,
         shippingAddress: cart.shippingAddress,
-        paymentMethod: cart.paymentMethod,
-        itemsPrice: cart.itemsPrice,
-        shippingPrice: cart.shippingPrice,
-        taxPrice: cart.taxPrice,
-        totalPrice: cart.totalPrice,
+        paymentMethod:   cart.paymentMethod,
+        itemsPrice:      cart.itemsPrice,
+        shippingPrice:   cart.shippingPrice,
+        taxPrice:        cart.taxPrice,
+        totalPrice:      cart.totalPrice,
       })
     )
   }
@@ -63,105 +79,113 @@ const PlaceOrderScreen = ({ history }) => {
   return (
     <>
       <CheckoutSteps step1 step2 step3 step4 />
-      <Row>
-        <Col md={8}>
-          <ListGroup variant='flush'>
-            <ListGroup.Item>
-              <h2>Shipping</h2>
-              <p>
-                <strong>Address:</strong>
-                {cart.shippingAddress.address}, {cart.shippingAddress.city}{' '}
-                {cart.shippingAddress.postalCode},{' '}
-                {cart.shippingAddress.country}
-              </p>
-            </ListGroup.Item>
 
-            <ListGroup.Item>
-              <h2>Payment Method</h2>
-              <strong>Method: </strong>
-              {cart.paymentMethod}
-            </ListGroup.Item>
+      <div className='ps-placeorder-layout'>
+        {/* ── Left: order details ── */}
+        <div className='ps-order-sections'>
 
-            <ListGroup.Item>
-              <h2>Order Items</h2>
-              {cart.cartItems.length === 0 ? (
-                <Message>Your cart is empty</Message>
-              ) : (
-                <ListGroup variant='flush'>
-                  {cart.cartItems.map((item, index) => (
-                    <ListGroup.Item key={index}>
-                      <Row>
-                        <Col md={1}>
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            fluid
-                            rounded
-                          />
-                        </Col>
-                        <Col>
-                          <Link to={`/product/${item.product}`}>
-                            {item.name}
-                          </Link>
-                        </Col>
-                        <Col md={4}>
-                          {item.qty} x ${item.price} = ${item.qty * item.price}
-                        </Col>
-                      </Row>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              )}
-            </ListGroup.Item>
-          </ListGroup>
-        </Col>
-        <Col md={4}>
-          <Card>
-            <ListGroup variant='flush'>
-              <ListGroup.Item>
-                <h2>Order Summary</h2>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Items</Col>
-                  <Col>${cart.itemsPrice}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Shipping</Col>
-                  <Col>${cart.shippingPrice}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Tax</Col>
-                  <Col>${cart.taxPrice}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Total</Col>
-                  <Col>${cart.totalPrice}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                {error && <Message variant='danger'>{error}</Message>}
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Button
-                  type='button'
-                  className='btn-block'
-                  disabled={cart.cartItems === 0}
-                  onClick={placeOrderHandler}
-                >
-                  Place Order
-                </Button>
-              </ListGroup.Item>
-            </ListGroup>
-          </Card>
-        </Col>
-      </Row>
+          {/* Shipping */}
+          <section aria-labelledby='po-shipping-heading' className='ps-order-section'>
+            <h2 id='po-shipping-heading' className='ps-order-section__title'>Shipping</h2>
+            <p className='ps-order-section__text'>
+              {cart.shippingAddress.address}, {cart.shippingAddress.city}{' '}
+              {cart.shippingAddress.postalCode}, {cart.shippingAddress.country}
+            </p>
+          </section>
+
+          <hr className='ps-divider' />
+
+          {/* Payment */}
+          <section aria-labelledby='po-payment-heading' className='ps-order-section'>
+            <h2 id='po-payment-heading' className='ps-order-section__title'>Payment Method</h2>
+            <p className='ps-order-section__text'>{cart.paymentMethod}</p>
+          </section>
+
+          <hr className='ps-divider' />
+
+          {/* Order items */}
+          <section aria-labelledby='po-items-heading' className='ps-order-section'>
+            <h2 id='po-items-heading' className='ps-order-section__title'>Order Items</h2>
+
+            {cart.cartItems.length === 0 ? (
+              <div className='ps-alert ps-alert--info' role='status'>
+                Your cart is empty.
+              </div>
+            ) : (
+              <ul className='ps-order-items-list' aria-label='Items in your order'>
+                {cart.cartItems.map((item, index) => (
+                  <li key={index} className='ps-order-item'>
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className='ps-order-item__img'
+                      loading='lazy'
+                    />
+                    <Link to={`/product/${item.product}`} className='ps-order-item__name'>
+                      {item.name}
+                    </Link>
+                    <span className='ps-order-item__calc'>
+                      {item.qty} × ${item.price} = ${addDecimals(item.qty * item.price)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+
+        {/* ── Right: summary card ── */}
+        <aside aria-label='Order summary'>
+          <div className='ps-summary-card'>
+            <h2 className='ps-summary-title'>Order Summary</h2>
+
+            <hr className='ps-divider' />
+
+            <div className='ps-summary-row'>
+              <span className='ps-summary-row__label'>Items</span>
+              <span className='ps-summary-row__value'>${cart.itemsPrice}</span>
+            </div>
+
+            <div className='ps-summary-row'>
+              <span className='ps-summary-row__label'>Shipping</span>
+              <span className='ps-summary-row__value'>${cart.shippingPrice}</span>
+            </div>
+
+            <div className='ps-summary-row'>
+              <span className='ps-summary-row__label'>Tax</span>
+              <span className='ps-summary-row__value'>${cart.taxPrice}</span>
+            </div>
+
+            <hr className='ps-divider' />
+
+            <div
+              className='ps-summary-row ps-summary-row--total'
+              aria-label={`Order total: $${cart.totalPrice}`}
+            >
+              <span className='ps-summary-row__label'>Total</span>
+              <span className='ps-summary-row__value'>${cart.totalPrice}</span>
+            </div>
+
+            <hr className='ps-divider' />
+
+            {error && (
+              <div className='ps-alert ps-alert--error' role='alert'>
+                {error}
+              </div>
+            )}
+
+            <button
+              type='button'
+              className='ps-btn ps-btn--primary'
+              disabled={cart.cartItems.length === 0}
+              aria-disabled={cart.cartItems.length === 0}
+              onClick={placeOrderHandler}
+            >
+              Place Order
+            </button>
+          </div>
+        </aside>
+      </div>
     </>
   )
 }

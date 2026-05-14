@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Form, Button } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import Message from '../components/Message'
-import Loader from '../components/Loader'
-import FormContainer from '../components/FormContainer'
 import { getUserDetails, updateUser } from '../actions/userActions'
 import { USER_UPDATE_RESET } from '../constants/userConstants'
+import './screens.css'
 
 const UserEditScreen = ({ match, history }) => {
   const userId = match.params.id
@@ -49,54 +46,84 @@ const UserEditScreen = ({ match, history }) => {
 
   return (
     <>
-      <Link to='/admin/userlist' className='btn btn-light my-3'>
-        Go Back
+      <Link to='/admin/userlist' className='ps-back'>
+        &#8592; Back to Users
       </Link>
-      <FormContainer>
-        <h1>Edit User</h1>
-        {loadingUpdate && <Loader />}
-        {errorUpdate && <Message variant='danger'>{errorUpdate}</Message>}
-        {loading ? (
-          <Loader />
-        ) : error ? (
-          <Message variant='danger'>{error}</Message>
-        ) : (
-          <Form onSubmit={submitHandler}>
-            <Form.Group controlId='name'>
-              <Form.Label>Name</Form.Label>
-              <Form.Control
-                type='name'
-                placeholder='Enter name'
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              ></Form.Control>
-            </Form.Group>
 
-            <Form.Group controlId='email'>
-              <Form.Label>Email Address</Form.Label>
-              <Form.Control
-                type='email'
-                placeholder='Enter email'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              ></Form.Control>
-            </Form.Group>
+      <div className='ps-checkout-page'>
+        <h1 className='ps-form-title'>Edit User</h1>
 
-            <Form.Group controlId='isadmin'>
-              <Form.Check
-                type='checkbox'
-                label='Is Admin'
-                checked={isAdmin}
-                onChange={(e) => setIsAdmin(e.target.checked)}
-              ></Form.Check>
-            </Form.Group>
-
-            <Button type='submit' variant='primary'>
-              Update
-            </Button>
-          </Form>
+        {loadingUpdate && (
+          <div className='ps-loader' role='status' aria-label='Saving'>
+            <div className='ps-loader__ring' />
+          </div>
         )}
-      </FormContainer>
+        {errorUpdate && (
+          <div className='ps-alert ps-alert--error' role='alert'>{errorUpdate}</div>
+        )}
+
+        {loading ? (
+          <div className='ps-loader' role='status' aria-label='Loading'>
+            <div className='ps-loader__ring' />
+          </div>
+        ) : error ? (
+          <div className='ps-alert ps-alert--error' role='alert'>{error}</div>
+        ) : (
+          <form onSubmit={submitHandler}>
+            <fieldset className='ps-fieldset'>
+              <legend>User Details</legend>
+
+              <div className='ps-form-group'>
+                <label className='ps-label' htmlFor='name'>
+                  Name <span className='ps-required' aria-hidden='true'>*</span>
+                </label>
+                <input
+                  id='name'
+                  type='text'
+                  className='ps-input'
+                  placeholder='Enter name'
+                  value={name}
+                  required
+                  aria-required='true'
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+
+              <div className='ps-form-group'>
+                <label className='ps-label' htmlFor='email'>
+                  Email Address <span className='ps-required' aria-hidden='true'>*</span>
+                </label>
+                <input
+                  id='email'
+                  type='email'
+                  className='ps-input'
+                  placeholder='Enter email'
+                  value={email}
+                  required
+                  aria-required='true'
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <div className='ps-checkbox-group'>
+                <input
+                  id='isadmin'
+                  type='checkbox'
+                  checked={isAdmin}
+                  onChange={(e) => setIsAdmin(e.target.checked)}
+                />
+                <label htmlFor='isadmin'>Is Admin</label>
+              </div>
+            </fieldset>
+
+            <div className='ps-form-submit'>
+              <button type='submit' className='ps-btn ps-btn--primary'>
+                Update
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
     </>
   )
 }

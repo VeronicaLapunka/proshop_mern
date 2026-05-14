@@ -1,33 +1,41 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Card } from 'react-bootstrap'
 import Rating from './Rating'
+import '../screens/screens.css'
 
-const Product = ({ product }) => {
-  return (
-    <Card className='my-3 p-3 rounded'>
-      <Link to={`/product/${product._id}`}>
-        <Card.Img src={product.image} variant='top' />
+// DESIGN_ACCESSIBILITY.md §8: image link hidden from AT (aria-hidden + tabIndex -1),
+// name link is the accessible entry point.
+const Product = ({ product }) => (
+  <article className='ps-product-card'>
+    <Link
+      to={`/product/${product._id}`}
+      className='ps-product-card__img-wrap'
+      aria-hidden='true'
+      tabIndex='-1'
+    >
+      <img
+        src={product.image}
+        alt=''
+        className='ps-product-card__img'
+        loading='lazy'
+      />
+    </Link>
+    <div className='ps-product-card__body'>
+      <Link
+        to={`/product/${product._id}`}
+        className='ps-product-card__title'
+      >
+        {product.name}
       </Link>
-
-      <Card.Body>
-        <Link to={`/product/${product._id}`}>
-          <Card.Title as='div'>
-            <strong>{product.name}</strong>
-          </Card.Title>
-        </Link>
-
-        <Card.Text as='div'>
-          <Rating
-            value={product.rating}
-            text={`${product.numReviews} reviews`}
-          />
-        </Card.Text>
-
-        <Card.Text as='h3'>${product.price}</Card.Text>
-      </Card.Body>
-    </Card>
-  )
-}
+      <Rating
+        value={product.rating}
+        text={`${product.numReviews} reviews`}
+      />
+      <p className='ps-product-card__price' aria-label={`Price: $${product.price}`}>
+        ${product.price}
+      </p>
+    </div>
+  </article>
+)
 
 export default Product

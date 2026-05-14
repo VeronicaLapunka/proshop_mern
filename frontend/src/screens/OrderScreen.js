@@ -2,10 +2,7 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { PayPalButton } from 'react-paypal-button-v2'
 import { Link } from 'react-router-dom'
-import { Row, Col, ListGroup, Image, Card, Button } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import Message from '../components/Message'
-import Loader from '../components/Loader'
 import {
   getOrderDetails,
   payOrder,
@@ -15,6 +12,32 @@ import {
   ORDER_PAY_RESET,
   ORDER_DELIVER_RESET,
 } from '../constants/orderConstants'
+import './screens.css'
+
+/*
+  ASCII wireframe (ANTI_SLOP):
+  h1: Order #<id>
+  ┌─────────────────────────────────┬──────────────────────┐
+  │  Shipping                       │  Order Summary       │
+  │  Name · Email · Address         │  Items:   $xx.xx     │
+  │  [Delivered ●] / [Not yet ✗]    │  Shipping: $xx.xx    │
+  │  ─────────────────────────────  │  Tax:      $xx.xx    │
+  │  Payment Method                 │  ──────────────────  │
+  │  PayPal   [Paid ●] / [Not ✗]    │  Total:   $xx.xx     │
+  │  ─────────────────────────────  │  ──────────────────  │
+  │  Order Items                    │  [PayPal button]     │
+  │  [img] Name       N×$p = $x     │     OR               │
+  └─────────────────────────────────┴  [Mark as Delivered] ┘
+
+  User journey: buyer → review order status → pay / track
+  Primary CTA: PayPal button (unpaid) / status review (paid)
+*/
+
+const Loader = () => (
+  <div className='ps-loader' role='status' aria-label='Loading…'>
+    <div className='ps-loader__ring' />
+  </div>
+)
 
 const OrderScreen = ({ match, history }) => {
   const orderId = match.params.id
@@ -88,145 +111,157 @@ const OrderScreen = ({ match, history }) => {
   return loading ? (
     <Loader />
   ) : error ? (
-    <Message variant='danger'>{error}</Message>
+    <div className='ps-alert ps-alert--error' role='alert'>{error}</div>
   ) : (
     <>
-      <h1>Order {order._id}</h1>
-      <Row>
-        <Col md={8}>
-          <ListGroup variant='flush'>
-            <ListGroup.Item>
-              <h2>Shipping</h2>
-              <p>
-                <strong>Name: </strong> {order.user.name}
-              </p>
-              <p>
-                <strong>Email: </strong>{' '}
+      <h1 className='ps-order-heading'>
+        Order{' '}
+        <span style={{ fontWeight: 'var(--ps-fw-light)', fontSize: '0.65em', wordBreak: 'break-all' }}>
+          #{order._id}
+        </span>
+      </h1>
+
+      <div className='ps-placeorder-layout'>
+        {/* ── Left: order details ── */}
+        <div className='ps-order-sections'>
+
+          {/* Shipping */}
+          <section aria-labelledby='ord-shipping-heading' className='ps-order-section'>
+            <h2 id='ord-shipping-heading' className='ps-order-section__title'>Shipping</h2>
+            <div className='ps-order-meta'>
+              <span><strong>Name:</strong> {order.user.name}</span>
+              <span>
+                <strong>Email:</strong>{' '}
                 <a href={`mailto:${order.user.email}`}>{order.user.email}</a>
-              </p>
-              <p>
-                <strong>Address:</strong>
+              </span>
+              <span>
+                <strong>Address:</strong>{' '}
                 {order.shippingAddress.address}, {order.shippingAddress.city}{' '}
-                {order.shippingAddress.postalCode},{' '}
-                {order.shippingAddress.country}
-              </p>
+                {order.shippingAddress.postalCode}, {order.shippingAddress.country}
+              </span>
+            </div>
+            <div style={{ marginTop: 'var(--ps-space-4)' }}>
               {order.isDelivered ? (
-                <Message variant='success'>
-                  Delivered on {order.deliveredAt}
-                </Message>
+                <span className='ps-badge ps-badge--success'>
+                  Delivered on {order.deliveredAt.substring(0, 10)}
+                </span>
               ) : (
-                <Message variant='danger'>Not Delivered</Message>
+                <span className='ps-badge ps-badge--danger'>Not delivered</span>
               )}
-            </ListGroup.Item>
+            </div>
+          </section>
 
-            <ListGroup.Item>
-              <h2>Payment Method</h2>
-              <p>
-                <strong>Method: </strong>
-                {order.paymentMethod}
-              </p>
+          <hr className='ps-divider' />
+
+          {/* Payment */}
+          <section aria-labelledby='ord-payment-heading' className='ps-order-section'>
+            <h2 id='ord-payment-heading' className='ps-order-section__title'>Payment Method</h2>
+            <p className='ps-order-section__text'>{order.paymentMethod}</p>
+            <div style={{ marginTop: 'var(--ps-space-4)' }}>
               {order.isPaid ? (
-                <Message variant='success'>Paid on {order.paidAt}</Message>
+                <span className='ps-badge ps-badge--success'>
+                  Paid on {order.paidAt.substring(0, 10)}
+                </span>
               ) : (
-                <Message variant='danger'>Not Paid</Message>
+                <span className='ps-badge ps-badge--danger'>Not paid</span>
               )}
-            </ListGroup.Item>
+            </div>
+          </section>
 
-            <ListGroup.Item>
-              <h2>Order Items</h2>
-              {order.orderItems.length === 0 ? (
-                <Message>Order is empty</Message>
-              ) : (
-                <ListGroup variant='flush'>
-                  {order.orderItems.map((item, index) => (
-                    <ListGroup.Item key={index}>
-                      <Row>
-                        <Col md={1}>
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            fluid
-                            rounded
-                          />
-                        </Col>
-                        <Col>
-                          <Link to={`/product/${item.product}`}>
-                            {item.name}
-                          </Link>
-                        </Col>
-                        <Col md={4}>
-                          {item.qty} x ${item.price} = ${item.qty * item.price}
-                        </Col>
-                      </Row>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              )}
-            </ListGroup.Item>
-          </ListGroup>
-        </Col>
-        <Col md={4}>
-          <Card>
-            <ListGroup variant='flush'>
-              <ListGroup.Item>
-                <h2>Order Summary</h2>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Items</Col>
-                  <Col>${order.itemsPrice}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Shipping</Col>
-                  <Col>${order.shippingPrice}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Tax</Col>
-                  <Col>${order.taxPrice}</Col>
-                </Row>
-              </ListGroup.Item>
-              <ListGroup.Item>
-                <Row>
-                  <Col>Total</Col>
-                  <Col>${order.totalPrice}</Col>
-                </Row>
-              </ListGroup.Item>
-              {!order.isPaid && (
-                <ListGroup.Item>
-                  {loadingPay && <Loader />}
-                  {!sdkReady ? (
-                    <Loader />
-                  ) : (
-                    <PayPalButton
-                      amount={order.totalPrice}
-                      onSuccess={successPaymentHandler}
+          <hr className='ps-divider' />
+
+          {/* Order items */}
+          <section aria-labelledby='ord-items-heading' className='ps-order-section'>
+            <h2 id='ord-items-heading' className='ps-order-section__title'>Order Items</h2>
+
+            {order.orderItems.length === 0 ? (
+              <div className='ps-alert ps-alert--info' role='status'>Order is empty.</div>
+            ) : (
+              <ul className='ps-order-items-list' aria-label='Items in this order'>
+                {order.orderItems.map((item, index) => (
+                  <li key={index} className='ps-order-item'>
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className='ps-order-item__img'
+                      loading='lazy'
                     />
-                  )}
-                </ListGroup.Item>
-              )}
-              {loadingDeliver && <Loader />}
-              {userInfo &&
-                userInfo.isAdmin &&
-                order.isPaid &&
-                !order.isDelivered && (
-                  <ListGroup.Item>
-                    <Button
-                      type='button'
-                      className='btn btn-block'
-                      onClick={deliverHandler}
-                    >
-                      Mark As Delivered
-                    </Button>
-                  </ListGroup.Item>
+                    <Link to={`/product/${item.product}`} className='ps-order-item__name'>
+                      {item.name}
+                    </Link>
+                    <span className='ps-order-item__calc'>
+                      {item.qty} × ${item.price} = $
+                      {(Math.round(item.qty * item.price * 100) / 100).toFixed(2)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+
+        {/* ── Right: summary card ── */}
+        <aside aria-label='Order summary'>
+          <div className='ps-summary-card'>
+            <h2 className='ps-summary-title'>Order Summary</h2>
+
+            <hr className='ps-divider' />
+
+            <div className='ps-summary-row'>
+              <span className='ps-summary-row__label'>Items</span>
+              <span className='ps-summary-row__value'>${order.itemsPrice}</span>
+            </div>
+            <div className='ps-summary-row'>
+              <span className='ps-summary-row__label'>Shipping</span>
+              <span className='ps-summary-row__value'>${order.shippingPrice}</span>
+            </div>
+            <div className='ps-summary-row'>
+              <span className='ps-summary-row__label'>Tax</span>
+              <span className='ps-summary-row__value'>${order.taxPrice}</span>
+            </div>
+
+            <hr className='ps-divider' />
+
+            <div className='ps-summary-row ps-summary-row--total'>
+              <span className='ps-summary-row__label'>Total</span>
+              <span className='ps-summary-row__value'>${order.totalPrice}</span>
+            </div>
+
+            {!order.isPaid && (
+              <>
+                <hr className='ps-divider' />
+                {loadingPay && <Loader />}
+                {!sdkReady ? (
+                  <Loader />
+                ) : (
+                  <PayPalButton
+                    amount={order.totalPrice}
+                    onSuccess={successPaymentHandler}
+                  />
                 )}
-            </ListGroup>
-          </Card>
-        </Col>
-      </Row>
+              </>
+            )}
+
+            {loadingDeliver && <Loader />}
+
+            {userInfo &&
+              userInfo.isAdmin &&
+              order.isPaid &&
+              !order.isDelivered && (
+                <>
+                  <hr className='ps-divider' />
+                  <button
+                    type='button'
+                    className='ps-btn ps-btn--primary'
+                    onClick={deliverHandler}
+                  >
+                    Mark as Delivered
+                  </button>
+                </>
+              )}
+          </div>
+        </aside>
+      </div>
     </>
   )
 }

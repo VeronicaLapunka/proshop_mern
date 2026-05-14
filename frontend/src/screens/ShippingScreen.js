@@ -1,18 +1,38 @@
 import React, { useState } from 'react'
-import { Form, Button } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import FormContainer from '../components/FormContainer'
 import CheckoutSteps from '../components/CheckoutSteps'
 import { saveShippingAddress } from '../actions/cartActions'
+import './screens.css'
+
+/*
+  ASCII wireframe (ANTI_SLOP):
+  [Step 1: Sign In ✓] [Step 2: Shipping ●] [Step 3: Payment] [Step 4: Place Order]
+  ─────────────────────────────────────── 48px gap
+  ┌──────────────── max-width 480px, centered ─────────────────┐
+  │  h1: Shipping Address                                       │
+  │  ┌─────────────────────────────────────────────────────┐   │
+  │  │  fieldset                                           │   │
+  │  │  legend: Delivery Details                           │   │
+  │  │  [label: Address]  [input text]                     │   │
+  │  │  [label: City]     [input text]                     │   │
+  │  │  [label: Postal]   [input text]                     │   │
+  │  │  [label: Country]  [input text]                     │   │
+  │  │  [Continue ─────────────────────────────────────]   │   │
+  │  └─────────────────────────────────────────────────────┘   │
+  └─────────────────────────────────────────────────────────────┘
+
+  User journey: logged-in buyer → enter shipping details → Payment
+  Primary CTA: Continue button
+*/
 
 const ShippingScreen = ({ history }) => {
   const cart = useSelector((state) => state.cart)
   const { shippingAddress } = cart
 
-  const [address, setAddress] = useState(shippingAddress.address)
-  const [city, setCity] = useState(shippingAddress.city)
-  const [postalCode, setPostalCode] = useState(shippingAddress.postalCode)
-  const [country, setCountry] = useState(shippingAddress.country)
+  const [address,    setAddress]    = useState(shippingAddress.address    || '')
+  const [city,       setCity]       = useState(shippingAddress.city       || '')
+  const [postalCode, setPostalCode] = useState(shippingAddress.postalCode || '')
+  const [country,    setCountry]    = useState(shippingAddress.country    || '')
 
   const dispatch = useDispatch()
 
@@ -23,59 +43,87 @@ const ShippingScreen = ({ history }) => {
   }
 
   return (
-    <FormContainer>
+    <>
       <CheckoutSteps step1 step2 />
-      <h1>Shipping</h1>
-      <Form onSubmit={submitHandler}>
-        <Form.Group controlId='address'>
-          <Form.Label>Address</Form.Label>
-          <Form.Control
-            type='text'
-            placeholder='Enter address'
-            value={address}
-            required
-            onChange={(e) => setAddress(e.target.value)}
-          ></Form.Control>
-        </Form.Group>
 
-        <Form.Group controlId='city'>
-          <Form.Label>City</Form.Label>
-          <Form.Control
-            type='text'
-            placeholder='Enter city'
-            value={city}
-            required
-            onChange={(e) => setCity(e.target.value)}
-          ></Form.Control>
-        </Form.Group>
+      <div className='ps-checkout-page'>
+        <h1 className='ps-form-title'>Shipping Address</h1>
 
-        <Form.Group controlId='postalCode'>
-          <Form.Label>Postal Code</Form.Label>
-          <Form.Control
-            type='text'
-            placeholder='Enter postal code'
-            value={postalCode}
-            required
-            onChange={(e) => setPostalCode(e.target.value)}
-          ></Form.Control>
-        </Form.Group>
+        <form onSubmit={submitHandler} noValidate>
+          <fieldset className='ps-fieldset'>
+            <legend>Delivery Details</legend>
 
-        <Form.Group controlId='country'>
-          <Form.Label>Country</Form.Label>
-          <Form.Control
-            type='text'
-            placeholder='Enter country'
-            value={country}
-            required
-            onChange={(e) => setCountry(e.target.value)}
-          ></Form.Control>
-        </Form.Group>
+            <div className='ps-form-group'>
+              <label htmlFor='shipping-address' className='ps-label'>
+                Address <span className='ps-required' aria-label='required'>*</span>
+              </label>
+              <input
+                id='shipping-address'
+                type='text'
+                className='ps-input'
+                placeholder='Street address'
+                value={address}
+                required
+                aria-required='true'
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
 
-        <Button type='submit' variant='primary'>
-          Continue
-        </Button>
-      </Form>
-    </FormContainer>
+            <div className='ps-form-group'>
+              <label htmlFor='shipping-city' className='ps-label'>
+                City <span className='ps-required' aria-label='required'>*</span>
+              </label>
+              <input
+                id='shipping-city'
+                type='text'
+                className='ps-input'
+                placeholder='City'
+                value={city}
+                required
+                aria-required='true'
+                onChange={(e) => setCity(e.target.value)}
+              />
+            </div>
+
+            <div className='ps-form-group'>
+              <label htmlFor='shipping-postal' className='ps-label'>
+                Postal Code <span className='ps-required' aria-label='required'>*</span>
+              </label>
+              <input
+                id='shipping-postal'
+                type='text'
+                className='ps-input'
+                placeholder='Postal code'
+                value={postalCode}
+                required
+                aria-required='true'
+                onChange={(e) => setPostalCode(e.target.value)}
+              />
+            </div>
+
+            <div className='ps-form-group'>
+              <label htmlFor='shipping-country' className='ps-label'>
+                Country <span className='ps-required' aria-label='required'>*</span>
+              </label>
+              <input
+                id='shipping-country'
+                type='text'
+                className='ps-input'
+                placeholder='Country'
+                value={country}
+                required
+                aria-required='true'
+                onChange={(e) => setCountry(e.target.value)}
+              />
+            </div>
+          </fieldset>
+
+          <button type='submit' className='ps-btn ps-btn--primary'>
+            Continue
+          </button>
+        </form>
+      </div>
+    </>
   )
 }
 

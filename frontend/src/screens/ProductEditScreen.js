@@ -1,13 +1,10 @@
 import axios from 'axios'
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Form, Button } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import Message from '../components/Message'
-import Loader from '../components/Loader'
-import FormContainer from '../components/FormContainer'
 import { listProductDetails, updateProduct } from '../actions/productActions'
 import { PRODUCT_UPDATE_RESET } from '../constants/productConstants'
+import './screens.css'
 
 const ProductEditScreen = ({ match, history }) => {
   const productId = match.params.id
@@ -93,102 +90,159 @@ const ProductEditScreen = ({ match, history }) => {
 
   return (
     <>
-      <Link to='/admin/productlist' className='btn btn-light my-3'>
-        Go Back
+      <Link to='/admin/productlist' className='ps-back'>
+        &#8592; Back to Products
       </Link>
-      <FormContainer>
-        <h1>Edit Product</h1>
-        {loadingUpdate && <Loader />}
-        {errorUpdate && <Message variant='danger'>{errorUpdate}</Message>}
-        {loading ? (
-          <Loader />
-        ) : error ? (
-          <Message variant='danger'>{error}</Message>
-        ) : (
-          <Form onSubmit={submitHandler}>
-            <Form.Group controlId='name'>
-              <Form.Label>Name</Form.Label>
-              <Form.Control
-                type='name'
-                placeholder='Enter name'
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              ></Form.Control>
-            </Form.Group>
 
-            <Form.Group controlId='price'>
-              <Form.Label>Price</Form.Label>
-              <Form.Control
-                type='number'
-                placeholder='Enter price'
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              ></Form.Control>
-            </Form.Group>
+      <div className='ps-checkout-page'>
+        <h1 className='ps-form-title'>Edit Product</h1>
 
-            <Form.Group controlId='image'>
-              <Form.Label>Image</Form.Label>
-              <Form.Control
-                type='text'
-                placeholder='Enter image url'
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-              ></Form.Control>
-              <Form.File
-                id='image-file'
-                label='Choose File'
-                custom
-                onChange={uploadFileHandler}
-              ></Form.File>
-              {uploading && <Loader />}
-            </Form.Group>
-
-            <Form.Group controlId='brand'>
-              <Form.Label>Brand</Form.Label>
-              <Form.Control
-                type='text'
-                placeholder='Enter brand'
-                value={brand}
-                onChange={(e) => setBrand(e.target.value)}
-              ></Form.Control>
-            </Form.Group>
-
-            <Form.Group controlId='countInStock'>
-              <Form.Label>Count In Stock</Form.Label>
-              <Form.Control
-                type='number'
-                placeholder='Enter countInStock'
-                value={countInStock}
-                onChange={(e) => setCountInStock(e.target.value)}
-              ></Form.Control>
-            </Form.Group>
-
-            <Form.Group controlId='category'>
-              <Form.Label>Category</Form.Label>
-              <Form.Control
-                type='text'
-                placeholder='Enter category'
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              ></Form.Control>
-            </Form.Group>
-
-            <Form.Group controlId='description'>
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                type='text'
-                placeholder='Enter description'
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              ></Form.Control>
-            </Form.Group>
-
-            <Button type='submit' variant='primary'>
-              Update
-            </Button>
-          </Form>
+        {loadingUpdate && (
+          <div className='ps-loader' role='status' aria-label='Saving'>
+            <div className='ps-loader__ring' />
+          </div>
         )}
-      </FormContainer>
+        {errorUpdate && (
+          <div className='ps-alert ps-alert--error' role='alert'>{errorUpdate}</div>
+        )}
+
+        {loading ? (
+          <div className='ps-loader' role='status' aria-label='Loading'>
+            <div className='ps-loader__ring' />
+          </div>
+        ) : error ? (
+          <div className='ps-alert ps-alert--error' role='alert'>{error}</div>
+        ) : (
+          <form onSubmit={submitHandler}>
+            <fieldset className='ps-fieldset'>
+              <legend>Product Details</legend>
+
+              <div className='ps-form-group'>
+                <label className='ps-label' htmlFor='name'>
+                  Name <span className='ps-required' aria-hidden='true'>*</span>
+                </label>
+                <input
+                  id='name'
+                  type='text'
+                  className='ps-input'
+                  placeholder='Enter name'
+                  value={name}
+                  required
+                  aria-required='true'
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+
+              <div className='ps-form-group'>
+                <label className='ps-label' htmlFor='price'>
+                  Price <span className='ps-required' aria-hidden='true'>*</span>
+                </label>
+                <input
+                  id='price'
+                  type='number'
+                  className='ps-input'
+                  placeholder='Enter price'
+                  value={price}
+                  required
+                  aria-required='true'
+                  onChange={(e) => setPrice(e.target.value)}
+                />
+              </div>
+
+              <div className='ps-form-group'>
+                <label className='ps-label' htmlFor='image'>
+                  Image URL
+                </label>
+                <input
+                  id='image'
+                  type='text'
+                  className='ps-input'
+                  placeholder='Enter image url'
+                  value={image}
+                  onChange={(e) => setImage(e.target.value)}
+                />
+                <input
+                  type='file'
+                  className='ps-file-input'
+                  aria-label='Upload image file'
+                  onChange={uploadFileHandler}
+                />
+                {uploading && (
+                  <div className='ps-loader' role='status' aria-label='Uploading'>
+                    <div className='ps-loader__ring' />
+                  </div>
+                )}
+              </div>
+
+              <div className='ps-form-group'>
+                <label className='ps-label' htmlFor='brand'>
+                  Brand <span className='ps-required' aria-hidden='true'>*</span>
+                </label>
+                <input
+                  id='brand'
+                  type='text'
+                  className='ps-input'
+                  placeholder='Enter brand'
+                  value={brand}
+                  required
+                  aria-required='true'
+                  onChange={(e) => setBrand(e.target.value)}
+                />
+              </div>
+
+              <div className='ps-form-group'>
+                <label className='ps-label' htmlFor='countInStock'>
+                  Count In Stock
+                </label>
+                <input
+                  id='countInStock'
+                  type='number'
+                  className='ps-input'
+                  placeholder='Enter count in stock'
+                  value={countInStock}
+                  onChange={(e) => setCountInStock(e.target.value)}
+                />
+              </div>
+
+              <div className='ps-form-group'>
+                <label className='ps-label' htmlFor='category'>
+                  Category <span className='ps-required' aria-hidden='true'>*</span>
+                </label>
+                <input
+                  id='category'
+                  type='text'
+                  className='ps-input'
+                  placeholder='Enter category'
+                  value={category}
+                  required
+                  aria-required='true'
+                  onChange={(e) => setCategory(e.target.value)}
+                />
+              </div>
+
+              <div className='ps-form-group'>
+                <label className='ps-label' htmlFor='description'>
+                  Description
+                </label>
+                <input
+                  id='description'
+                  type='text'
+                  className='ps-input'
+                  placeholder='Enter description'
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
+            </fieldset>
+
+            <div className='ps-form-submit'>
+              <button type='submit' className='ps-btn ps-btn--primary'>
+                Update
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
     </>
   )
 }

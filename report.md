@@ -163,23 +163,23 @@ args: { "feature_id": "search_v2" }
 
 **Раунд 1** — `query: "database MongoDB why chosen architecture decision"`, top_k=5
 
-| # | score | source_file | parent_headings | snippet |
-|---|-------|-------------|-----------------|---------|
-| 1 | 0.586 | best-practices.md | RTK Query vs. TanStack Query | RTK Query ~40KB vs TanStack ~16KB — architectural decision |
-| 2 | 0.577 | dev-history.md | Decision 1: MongoDB over PostgreSQL | "Made in January 2023 before the first commit. The rationale: the product catalog has variable attributes (electronics have wattage/voltage, clothing has…" |
-| 3 | 0.557 | best-practices.md | Embed vs. reference | Unbounded arrays embedded — common production failure |
-| 4 | 0.550 | dev-history.md | Decision 4: Staying on Bootstrap 4 | Bootstrap 4 chosen in January 2023 |
-| 5 | 0.545 | architecture.md | System Overview | ProShop — MERN stack (MongoDB, Express, React, Node) |
+| #   | score | source_file       | parent_headings                     | snippet                                                                                                                                                     |
+| --- | ----- | ----------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | 0.586 | best-practices.md | RTK Query vs. TanStack Query        | RTK Query ~40KB vs TanStack ~16KB — architectural decision                                                                                                  |
+| 2   | 0.577 | dev-history.md    | Decision 1: MongoDB over PostgreSQL | "Made in January 2023 before the first commit. The rationale: the product catalog has variable attributes (electronics have wattage/voltage, clothing has…" |
+| 3   | 0.557 | best-practices.md | Embed vs. reference                 | Unbounded arrays embedded — common production failure                                                                                                       |
+| 4   | 0.550 | dev-history.md    | Decision 4: Staying on Bootstrap 4  | Bootstrap 4 chosen in January 2023                                                                                                                          |
+| 5   | 0.545 | architecture.md   | System Overview                     | ProShop — MERN stack (MongoDB, Express, React, Node)                                                                                                        |
 
 Чанк #2 релевантен (dev-history.md, Decision 1), но score 0.577 — слабо. Уточнение:
 
 **Раунд 2** — `query: "MongoDB chosen rationale flexible schema document store"`, top_k=3
 
-| # | score | source_file | parent_headings | snippet |
-|---|-------|-------------|-----------------|---------|
-| 1 | **0.727** | dev-history.md | Decision 1: MongoDB over PostgreSQL | "Made in January 2023 before the first commit. The rationale: the product catalog has variable attributes (electronics have wattage/voltage, clothing has…" |
-| 2 | 0.634 | architecture.md | 5.4 Mongoose Models | "See Section 6 for full schema detail." |
-| 3 | 0.627 | glossary.md | Mongoose | "ODM for MongoDB in Node.js. Provides schema validation, type coercion, and middleware hooks." |
+| #   | score     | source_file     | parent_headings                     | snippet                                                                                                                                                     |
+| --- | --------- | --------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **0.727** | dev-history.md  | Decision 1: MongoDB over PostgreSQL | "Made in January 2023 before the first commit. The rationale: the product catalog has variable attributes (electronics have wattage/voltage, clothing has…" |
+| 2   | 0.634     | architecture.md | 5.4 Mongoose Models                 | "See Section 6 for full schema detail."                                                                                                                     |
+| 3   | 0.627     | glossary.md     | Mongoose                            | "ODM for MongoDB in Node.js. Provides schema validation, type coercion, and middleware hooks."                                                              |
 
 **Ответ:** БД — **MongoDB**. Выбрана в январе 2023 вместо PostgreSQL по причине переменных атрибутов товаров (электроника: wattage/voltage, одежда: размеры/цвета) — гибкая документная схема подходит лучше реляционной таблицы. Чанк из `dev-history.md` → Decision 1 — прямой ADR-ответ, score 0.727.
 
@@ -189,23 +189,23 @@ args: { "feature_id": "search_v2" }
 
 **Раунд 1** — `query: "search_v2 feature dependencies features that depend on"`, top_k=5
 
-| # | score | source_file | parent_headings | snippet |
-|---|-------|-------------|-----------------|---------|
-| 1 | 0.677 | feature-flags-spec.md | Avoiding Flag Dependency Chains | "Each dependency listed in a flag's array adds a constraint that must be managed manually. Deep chains — where flag C depends on B, which depends on A…" |
-| 2 | 0.645 | feature-flags-spec.md | Tool 2: set_feature_state | Purpose: Change the state of a feature flag. Automatically adjusts traffic… |
-| 3 | 0.637 | feature-flags-spec.md | 4. Feature Flag Catalog | "This section describes all 25 feature flags defined in…" |
-| 4 | 0.622 | feature-flags-spec.md | Tool 1: get_feature_info | "Retrieve the complete current state of a single feature flag." |
-| 5 | 0.620 | feature-flags-spec.md | 2. The features.json Format | "The file contains a single top-level JSON object. Each key is a feature ID…" |
+| #   | score | source_file           | parent_headings                 | snippet                                                                                                                                                  |
+| --- | ----- | --------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | 0.677 | feature-flags-spec.md | Avoiding Flag Dependency Chains | "Each dependency listed in a flag's array adds a constraint that must be managed manually. Deep chains — where flag C depends on B, which depends on A…" |
+| 2   | 0.645 | feature-flags-spec.md | Tool 2: set_feature_state       | Purpose: Change the state of a feature flag. Automatically adjusts traffic…                                                                              |
+| 3   | 0.637 | feature-flags-spec.md | 4. Feature Flag Catalog         | "This section describes all 25 feature flags defined in…"                                                                                                |
+| 4   | 0.622 | feature-flags-spec.md | Tool 1: get_feature_info        | "Retrieve the complete current state of a single feature flag."                                                                                          |
+| 5   | 0.620 | feature-flags-spec.md | 2. The features.json Format     | "The file contains a single top-level JSON object. Each key is a feature ID…"                                                                            |
 
 **Раунд 2** — `query: "search_v2 flag catalog dependencies enabled"`, top_k=5
 
-| # | score | source_file | parent_headings | snippet |
-|---|-------|-------------|-----------------|---------|
-| 1 | 0.684 | feature-flags-spec.md | Avoiding Flag Dependency Chains | "Each dependency listed… Deep chains…" |
-| 2 | 0.670 | feature-flag-toggle.md | Reference Commands | "Last updated: M3 curriculum." |
-| 3 | 0.659 | feature-flags-spec.md | 4. Feature Flag Catalog | "This section describes all 25 feature flags…" |
-| 4 | 0.647 | feature-flags-spec.md | What Are Feature Flags? | "A feature flag lets you turn functionality on or off without deploying…" |
-| 5 | 0.639 | best-practices.md | OpenFeature | CNCF vendor-neutral standard… |
+| #   | score | source_file            | parent_headings                 | snippet                                                                   |
+| --- | ----- | ---------------------- | ------------------------------- | ------------------------------------------------------------------------- |
+| 1   | 0.684 | feature-flags-spec.md  | Avoiding Flag Dependency Chains | "Each dependency listed… Deep chains…"                                    |
+| 2   | 0.670 | feature-flag-toggle.md | Reference Commands              | "Last updated: M3 curriculum."                                            |
+| 3   | 0.659 | feature-flags-spec.md  | 4. Feature Flag Catalog         | "This section describes all 25 feature flags…"                            |
+| 4   | 0.647 | feature-flags-spec.md  | What Are Feature Flags?         | "A feature flag lets you turn functionality on or off without deploying…" |
+| 5   | 0.639 | best-practices.md      | OpenFeature                     | CNCF vendor-neutral standard…                                             |
 
 **Вывод:** Оба раунда вернули общие секции про dependency chains и инструменты, но ни один чанк не содержит конкретного перечня флагов, зависящих от `search_v2`. Corpus проиндексирован по chunk'ам заголовков — каталог флагов попал в один крупный чанк без детализации по зависимостям. Max score 0.684 — ниже порога уверенного ответа.
 
@@ -217,25 +217,25 @@ args: { "feature_id": "search_v2" }
 
 **Раунд 1** — `query: "checkout incident bug production issue"`, top_k=5
 
-| # | score | source_file | parent_headings | snippet |
-|---|-------|-------------|-----------------|---------|
-| 1 | 0.680 | feature-flags-spec.md | guest_checkout — Guest Checkout Without Registration | "Unauthenticated users can complete a purchase without creating an account. A temporary guest session token is issued at checkout entry…" |
-| 2 | 0.679 | incident-response.md | Phase 7: Post-Incident / Action Items | "Create a Jira/GitHub issue for each action item. Review in weekly standup until resolved." |
-| 3 | 0.663 | feature-flags-spec.md | express_checkout — Express One-Click Checkout | "Authenticated users who have previously completed an order see a 'Buy Now' button…" |
-| 4 | 0.660 | glossary.md | Cart Abandonment Rate | "Percentage of shopping carts created but not converted to orders. Indicates friction in checkout…" |
-| 5 | 0.659 | i-001-paypal-double-charge.md | Lessons | "PayPal sandbox does not faithfully replicate production behavior. Double-callback occurs in sandbox due to retry logic…" |
+| #   | score | source_file                   | parent_headings                                      | snippet                                                                                                                                   |
+| --- | ----- | ----------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | 0.680 | feature-flags-spec.md         | guest_checkout — Guest Checkout Without Registration | "Unauthenticated users can complete a purchase without creating an account. A temporary guest session token is issued at checkout entry…" |
+| 2   | 0.679 | incident-response.md          | Phase 7: Post-Incident / Action Items                | "Create a Jira/GitHub issue for each action item. Review in weekly standup until resolved."                                               |
+| 3   | 0.663 | feature-flags-spec.md         | express_checkout — Express One-Click Checkout        | "Authenticated users who have previously completed an order see a 'Buy Now' button…"                                                      |
+| 4   | 0.660 | glossary.md                   | Cart Abandonment Rate                                | "Percentage of shopping carts created but not converted to orders. Indicates friction in checkout…"                                       |
+| 5   | 0.659 | i-001-paypal-double-charge.md | Lessons                                              | "PayPal sandbox does not faithfully replicate production behavior. Double-callback occurs in sandbox due to retry logic…"                 |
 
 Инцидент виден на #5, но заглушён feature-flags и glossary. Уточнение:
 
 **Раунд 2** — `query: "PayPal double charge checkout incident root cause fix"`, top_k=5
 
-| # | score | source_file | parent_headings | snippet |
-|---|-------|-------------|-----------------|---------|
-| 1 | **0.715** | i-001-paypal-double-charge.md | Summary | "A subset of orders placed via PayPal were being marked as paid twice in the database, resulting in duplicate documents and — in three cases — inventory being decremented twice for the same…" |
-| 2 | **0.708** | i-001-paypal-double-charge.md | Impact | "Orders affected: 7 orders with duplicate entries. Inventory: 3 products with stock decremented below true value (including one at -1). Customer impact: Zero." |
-| 3 | 0.659 | feature-flags-spec.md | guest_checkout | Guest session token issued at checkout entry… |
-| 4 | 0.654 | i-001-paypal-double-charge.md | Root Cause Analysis | "The SDK fires the callback when PayPal confirms payment authorization. The application's handler called PUT /api/orders/:id/pay. The backend handler at that time: No idempotency guard…" |
-| 5 | 0.646 | best-practices.md | 5.6 Double-charge prevention at the order level | "Add a database-level guard: an order can only transition to paid state once. Implement with a Mongoose status field and an atomic update…" |
+| #   | score     | source_file                   | parent_headings                                 | snippet                                                                                                                                                                                         |
+| --- | --------- | ----------------------------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **0.715** | i-001-paypal-double-charge.md | Summary                                         | "A subset of orders placed via PayPal were being marked as paid twice in the database, resulting in duplicate documents and — in three cases — inventory being decremented twice for the same…" |
+| 2   | **0.708** | i-001-paypal-double-charge.md | Impact                                          | "Orders affected: 7 orders with duplicate entries. Inventory: 3 products with stock decremented below true value (including one at -1). Customer impact: Zero."                                 |
+| 3   | 0.659     | feature-flags-spec.md         | guest_checkout                                  | Guest session token issued at checkout entry…                                                                                                                                                   |
+| 4   | 0.654     | i-001-paypal-double-charge.md | Root Cause Analysis                             | "The SDK fires the callback when PayPal confirms payment authorization. The application's handler called PUT /api/orders/:id/pay. The backend handler at that time: No idempotency guard…"      |
+| 5   | 0.646     | best-practices.md             | 5.6 Double-charge prevention at the order level | "Add a database-level guard: an order can only transition to paid state once. Implement with a Mongoose status field and an atomic update…"                                                     |
 
 **Ответ:** Последний инцидент — **i-001: PayPal Sandbox Webhook Double-Charge**.
 
@@ -250,11 +250,11 @@ args: { "feature_id": "search_v2" }
 
 #### Итоги по трём вопросам
 
-| Вопрос | Нашёл MCP? | Max score | Fallback нужен? |
-|--------|-----------|-----------|-----------------|
-| Q1: Какая БД и почему? | ✅ Да (dev-history.md, Decision 1) | 0.727 | Нет |
-| Q2: Зависимости search_v2 | ❌ Нет прямого ответа | 0.684 | Да → читать feature-flags-spec.md или list_features |
-| Q3: Последний инцидент checkout | ✅ Да (i-001-paypal-double-charge.md) | 0.715 | Нет |
+| Вопрос                          | Нашёл MCP?                            | Max score | Fallback нужен?                                     |
+| ------------------------------- | ------------------------------------- | --------- | --------------------------------------------------- |
+| Q1: Какая БД и почему?          | ✅ Да (dev-history.md, Decision 1)    | 0.727     | Нет                                                 |
+| Q2: Зависимости search_v2       | ❌ Нет прямого ответа                 | 0.684     | Да → читать feature-flags-spec.md или list_features |
+| Q3: Последний инцидент checkout | ✅ Да (i-001-paypal-double-charge.md) | 0.715     | Нет                                                 |
 
 **Вывод:** уточнение запроса (раунд 2) критично — первый запрос по Q1 дал 0.577, после перефразирования 0.727. Q2 упирается в структуру чанкинга: весь каталог флагов попал в один большой чанк без раскрытия зависимостей → vector search не справляется, нужен fallback на live feature-flags MCP.
 
@@ -273,13 +273,13 @@ tool: mcp__docs-search__search_project_docs
 args: { "query": "semantic_search feature description dependencies what it does", "top_k": 5 }
 ```
 
-| # | score | source_file | parent_headings | snippet |
-|---|-------|-------------|-----------------|---------|
-| 1 | 0.685 | feature-flags-spec.md | Avoiding Flag Dependency Chains | "Each dependency listed in a flag's array adds a constraint that must be managed manually…" |
-| 2 | 0.660 | feature-flags-spec.md | Tool 1: get_feature_info | "Purpose: Retrieve the complete current state of a single feature flag." |
-| 3 | **0.657** | feature-flags-spec.md | `semantic_search` — Semantic Vector Search | "Extends search_v2 with embedding-based retrieval. Product embeddings are pre-computed and stored; at query time, the user's search string is embedded and…" |
-| 4 | 0.643 | feature-flags-spec.md | 2. The features.json Format | "The file contains a single top-level JSON object." |
-| 5 | 0.632 | feature-flags-spec.md | 4. Feature Flag Catalog | "This section describes all 25 feature flags…" |
+| #   | score     | source_file           | parent_headings                            | snippet                                                                                                                                                      |
+| --- | --------- | --------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | 0.685     | feature-flags-spec.md | Avoiding Flag Dependency Chains            | "Each dependency listed in a flag's array adds a constraint that must be managed manually…"                                                                  |
+| 2   | 0.660     | feature-flags-spec.md | Tool 1: get_feature_info                   | "Purpose: Retrieve the complete current state of a single feature flag."                                                                                     |
+| 3   | **0.657** | feature-flags-spec.md | `semantic_search` — Semantic Vector Search | "Extends search_v2 with embedding-based retrieval. Product embeddings are pre-computed and stored; at query time, the user's search string is embedded and…" |
+| 4   | 0.643     | feature-flags-spec.md | 2. The features.json Format                | "The file contains a single top-level JSON object."                                                                                                          |
+| 5   | 0.632     | feature-flags-spec.md | 4. Feature Flag Catalog                    | "This section describes all 25 feature flags…"                                                                                                               |
 
 Чанк #3 содержит нужный раздел каталога, но score 0.657 — неуверенно. Уточнение:
 
@@ -292,11 +292,11 @@ tool: mcp__docs-search__search_project_docs
 args: { "query": "semantic_search embedding vector retrieval product search rollout", "top_k": 3 }
 ```
 
-| # | score | source_file | parent_headings | snippet |
-|---|-------|-------------|-----------------|---------|
-| 1 | **0.743** | feature-flags-spec.md | `semantic_search` — Semantic Vector Search | "Extends search_v2 with embedding-based retrieval. Product embeddings are pre-computed and stored; at query time, the user's search string is embedded and…" |
-| 2 | 0.642 | feature-flags-spec.md | `search_v2` — New Search Algorithm | "The current product search uses MongoDB regex on the product name field only. search_v2 replaces this with a hybrid BM25 + TF-IDF ranking pipeline…" |
-| 3 | 0.633 | home.md | User Actions | "Search: Triggered from Header…" |
+| #   | score     | source_file           | parent_headings                            | snippet                                                                                                                                                      |
+| --- | --------- | --------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | **0.743** | feature-flags-spec.md | `semantic_search` — Semantic Vector Search | "Extends search_v2 with embedding-based retrieval. Product embeddings are pre-computed and stored; at query time, the user's search string is embedded and…" |
+| 2   | 0.642     | feature-flags-spec.md | `search_v2` — New Search Algorithm         | "The current product search uses MongoDB regex on the product name field only. search_v2 replaces this with a hybrid BM25 + TF-IDF ranking pipeline…"        |
+| 3   | 0.633     | home.md               | User Actions                               | "Search: Triggered from Header…"                                                                                                                             |
 
 Чанк #1 — точное попадание (score 0.743). Из документации:
 
@@ -333,6 +333,7 @@ args: { "feature_id": "semantic_search" }
 ```
 
 **Проверка условия:**
+
 - `semantic_search.status` = `Disabled` ✅
 - `search_v2` (зависимость) = `Testing` ≠ `Disabled` ✅
 
@@ -411,12 +412,14 @@ args: { "feature_id": "semantic_search" }
 #### Анализ цепочки: ожидаемая vs фактическая
 
 **Ожидаемая цепочка:**
+
 ```
 search_project_docs → get_feature_info → анализ зависимостей →
 set_feature_state → adjust_traffic_rollout → get_feature_info → цитата
 ```
 
 **Фактическая цепочка:**
+
 ```
 Round 1:  search_project_docs("semantic_search feature description...")
           + ToolSearch("get_feature_info")       ← параллельно (загрузка схемы)
@@ -438,12 +441,12 @@ Round 9:  [цитата из контекста чанков, без доп. too
 
 **Отклонения от ожидаемой цепочки:**
 
-| # | Отклонение | Причина | Влияние |
-|---|-----------|---------|---------|
-| 1 | `search_project_docs` вызван **дважды** (уточняющий раунд) | Score 0.657 в первом раунде — агент решил уточнить запрос | Полезно, но не в expected |
-| 2 | `get_feature_info` вызван **параллельно** с search round 2, а не после него | Оптимизация: оба независимы по входным данным | Порядок нарушен, результат тот же |
-| 3 | **3 × ToolSearch** (загрузка схем) как дополнительные шаги | Deferred tools — схемы не загружены заранее | Артефакт архитектуры системы, не семантическое отклонение |
-| 4 | Цитата взята **из кэша контекста**, не отдельным tool call | Чанки уже были в памяти после search раундов | Корректно, экономит токены |
+| #   | Отклонение                                                                  | Причина                                                   | Влияние                                                   |
+| --- | --------------------------------------------------------------------------- | --------------------------------------------------------- | --------------------------------------------------------- |
+| 1   | `search_project_docs` вызван **дважды** (уточняющий раунд)                  | Score 0.657 в первом раунде — агент решил уточнить запрос | Полезно, но не в expected                                 |
+| 2   | `get_feature_info` вызван **параллельно** с search round 2, а не после него | Оптимизация: оба независимы по входным данным             | Порядок нарушен, результат тот же                         |
+| 3   | **3 × ToolSearch** (загрузка схем) как дополнительные шаги                  | Deferred tools — схемы не загружены заранее               | Артефакт архитектуры системы, не семантическое отклонение |
+| 4   | Цитата взята **из кэша контекста**, не отдельным tool call                  | Чанки уже были в памяти после search раундов              | Корректно, экономит токены                                |
 
 **Ключевое отклонение:** `get_feature_info` вызван **до завершения анализа документации** — параллельно с уточняющим search. Агент не дождался полного понимания зависимостей из доков перед проверкой live-статуса. В данном случае безопасно (доки и live-данные совпали), но в более сложном сценарии (скрытые зависимости только в документации) это могло привести к ошибке — агент мог бы начать менять статус флага, не зная всех ограничений.
 
@@ -451,17 +454,17 @@ Round 9:  [цитата из контекста чанков, без доп. too
 
 #### Итоговое состояние
 
-| Поле | До | После |
-|------|----|-------|
-| status | Disabled | **Testing** |
-| traffic_percentage | 0% | **25%** |
-| last_modified | 2026-02-14 | 2026-05-11 |
+| Поле               | До         | После       |
+| ------------------ | ---------- | ----------- |
+| status             | Disabled   | **Testing** |
+| traffic_percentage | 0%         | **25%**     |
+| last_modified      | 2026-02-14 | 2026-05-11  |
 
 ---
 
 #### Цитата из документации (зачем нужна фича)
 
-> *"Augments keyword search with embedding-based semantic similarity. Products are encoded at index time; queries are embedded at runtime and matched via cosine similarity. Requires `search_v2` to be Enabled first. **Significantly improves discovery for natural-language queries like 'good headphones for running'**."*
+> _"Augments keyword search with embedding-based semantic similarity. Products are encoded at index time; queries are embedded at runtime and matched via cosine similarity. Requires `search_v2` to be Enabled first. **Significantly improves discovery for natural-language queries like 'good headphones for running'**."_
 >
 > — `feature-flags-spec.md` → Feature Flag Catalog → Search & Discovery → `semantic_search`
 
@@ -884,3 +887,84 @@ feature-flags-spec.md и checkout.md features.
 
 Главный вывод: --folder incidents как pre-filter критичен для Q3. Q2 работает хорошо без
 фильтра. Q1 упирается в отсутствие explicit ADR-текста о выборе MongoDB.
+
+---
+
+## HW4: UI Redesign — WCAG 2.1 AA Design System
+
+### Redesigned pages
+
+| #   | Page                         | Route                               | File                        | Видимость |    Сделал?     |
+| --- | ---------------------------- | ----------------------------------- | --------------------------- | --------- | :------------: |
+| 1   | Home / Search results        | `/`, `/search/:keyword`, `/page/:n` | `HomeScreen.js`             | public    |       ✅       |
+| 2   | Product details              | `/product/:id`                      | `ProductScreen.js`          | public    |       ✅       |
+| 3   | Cart                         | `/cart/:id?`                        | `CartScreen.js`             | public    |       ✅       |
+| 4   | Login                        | `/login`                            | `LoginScreen.js`            | public    |       ✅       |
+| 5   | Register                     | `/register`                         | `RegisterScreen.js`         | public    |       ✅       |
+| 6   | Profile                      | `/profile`                          | `ProfileScreen.js`          | auth      |       ✅       |
+| 7   | Shipping                     | `/shipping`                         | `ShippingScreen.js`         | auth      |       ✅       |
+| 8   | Payment                      | `/payment`                          | `PaymentScreen.js`          | auth      |       ✅       |
+| 9   | Place Order                  | `/placeorder`                       | `PlaceOrderScreen.js`       | auth      |       ✅       |
+| 10  | Order details                | `/order/:id`                        | `OrderScreen.js`            | auth      |       ✅       |
+| 11  | Admin: Users list            | `/admin/userlist`                   | `UserListScreen.js`         | admin     |       ✅       |
+| 12  | Admin: User edit             | `/admin/user/:id/edit`              | `UserEditScreen.js`         | admin     |       ✅       |
+| 13  | Admin: Products list         | `/admin/productlist`                | `ProductListScreen.js`      | admin     |       ✅       |
+| 14  | Admin: Product edit          | `/admin/product/:id/edit`           | `ProductEditScreen.js`      | admin     |       ✅       |
+| 15  | Admin: Orders list           | `/admin/orderlist`                  | `OrderListScreen.js`        | admin     |       ✅       |
+| 16  | **Admin: Feature Dashboard** | `/admin/featuredashboard`           | `FeatureDashboardScreen.js` | admin     | ✅ обязательно |
+
+### Tools used
+
+- **Claude Design** — for creating DESIGN.md and DESIGN_ACCESSIBILITY.md
+- **Claude Code** — primary tool for all redesign work (code generation + iteration)
+- **Puppeteer** (system Chrome) — before/after screenshot automation via `tmp/screenshot.mjs` + `tmp/screenshot-admin.mjs`
+- **`tmp/capture.sh`** — git stash workflow: stash redesigned files → shoot "before" → pop → shoot "after"
+- **DESIGN_ACCESSIBILITY.md** — primary spec (WCAG 2.1 Level AA requirements)
+- **ANTI_SLOP.md** — visual guardrails (no gradients, ≥48px section gaps, ≤1px borders, max 60vh hero)
+- **DESIGN.md** — EPAM Design System color/typography tokens
+
+### Component decisions
+
+| What                                        | Taken ready-made        | Custom / replaced with                                                                      |
+| ------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------- |
+| Bootstrap `Form`, `Button`, `Row`, `Col`    | ❌ removed              | Native `<form>`, `<fieldset>`, `<legend>`, `<button>`                                       |
+| Bootstrap `Table`                           | ❌ removed              | `.ps-table` — semantic `<table>` with `scope='col'`, `.ps-sr-only` on empty action headers  |
+| Bootstrap `Message` / `Loader`              | ❌ removed              | `.ps-alert--error/success/info` + `.ps-loader` (CSS keyframe spinner)                       |
+| `LinkContainer` from react-router-bootstrap | ❌ removed              | Plain `<Link>` from react-router-dom                                                        |
+| `FormContainer`                             | ❌ removed              | `.ps-checkout-page` (max-width: 480px centered)                                             |
+| FontAwesome `<i className='fas fa-*'>`      | ❌ removed              | Inline SVG icons (IconCheck, IconX, IconEdit, IconTrash, IconPlus) — no external dependency |
+| `Form.File` (Bootstrap file input)          | ❌ removed              | Native `<input type='file' className='ps-file-input'>`                                      |
+| `PayPalButton`                              | ✅ kept as-is           | — (third-party, no visual redesign)                                                         |
+| `Paginate` component                        | ✅ kept as-is           | Wrapped with `.ps-pagination` CSS                                                           |
+| `Rating` component                          | ✅ kept as-is           | Added `.rating` CSS override for spacing                                                    |
+| Redux logic (all thunks, selectors)         | ✅ 100% preserved       | No changes to any action/reducer/constant files                                             |
+| `screens.css`                               | ❌ created from scratch | 1368-line design system: tokens, utilities, 27 sections, `ps-` namespace                    |
+
+**Key CSS patterns introduced:**
+
+- `ps-checkout-page` — narrow centered form layout (all auth + edit screens)
+- `ps-fieldset` / `.ps-fieldset legend` — WCAG 1.3.1 semantic form groups
+- `ps-placeorder-layout` / `ps-cart-layout` — 2-column `1fr 300px` grid with sticky summary card
+- `ps-profile-layout` — `300px 1fr` grid (form + orders table side by side)
+- `ps-admin-toolbar` — flex row with title + action button
+- `ps-badge--success/danger` — pill status badges (paid/delivered/admin)
+- `ps-table` — full data table system with hover rows and caption support
+
+**Screenshot automation:**
+
+```bash
+bash tmp/capture.sh after     # capture after redesign (no stash)
+bash tmp/capture.sh           # full before+after (uses git stash)
+```
+
+30 screenshots in `tmp/screenshots/` — `before_*.png` + `after_*.png` for all 16 pages.
+
+### My notes:
+
+In claude.ai/design I chose model Haiku 4.5, attached code base, also provided design template
+and through several minutes I got the design. Then I decided do separate design for other pages with
+prompt from accessibility-export.
+I also added files/logic that save screenshot before and after redesign, for me to see the difference.
+I put folder with these files in gitignore.
+
+During HW4 I spent apporoximately 10$ in Claude

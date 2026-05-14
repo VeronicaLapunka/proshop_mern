@@ -126,6 +126,41 @@ PAYPAL_CLIENT_ID = your_paypal_client_id
 - **Изменение статуса** ("включи фичу X", "переведи Y в Testing", "поставь трафик 25%") → вызывать `set_feature_state` / `adjust_traffic_rollout`. **Никогда не редактировать `backend/features.json` вручную через Edit/Write.**
 - **Список всех фич** → вызывать `list_features`. Не grep'ать файл.
 
+## Screenshot Workflow (before/after redesign)
+
+After redesigning any screen, capture before/after screenshots to document the visual change.
+
+**RULE: After completing any screen redesign task, always run `node tmp/screenshot-admin.mjs after` (auth screens) or `bash tmp/capture.sh after` (all screens) automatically — do not wait for the user to ask.**
+
+### Quick command
+```bash
+bash tmp/capture.sh           # full before + after for all pages
+bash tmp/capture.sh after     # only "after" (current design, no stash needed)
+```
+
+### Prerequisites (one-time)
+```bash
+npm run data:import    # seed DB — required for order/profile screenshots
+cd tmp && npm install  # install puppeteer (already done)
+```
+
+### Adding a newly redesigned screen to the capture pipeline
+
+1. **Public page** — add one entry to `PAGES` array in `tmp/screenshot.mjs`:
+   ```js
+   { path: '/your-path', name: 'slug', waitFor: 'css-selector', delay: 800 },
+   ```
+
+2. **Auth-required page** — add a `shoot()` call in `tmp/screenshot-admin.mjs` after the login block:
+   ```js
+   await shoot(page, `${BASE}/your-path`, 'slug', { waitFor: 'selector', delay: 1000 });
+   ```
+
+3. **Add the screen file to the stash list** in `tmp/capture.sh` (the `git stash push` block), so the "before" state can be restored correctly.
+
+Screenshots land in `tmp/screenshots/` as `{before,after}_{slug}.png` at 2× retina.
+Full instructions: `tmp/README.md`.
+
 ## After Running Commands
 
 When running any command, Claude Code will summarize:

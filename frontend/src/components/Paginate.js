@@ -1,27 +1,41 @@
 import React from 'react'
-import { Pagination } from 'react-bootstrap'
-import { LinkContainer } from 'react-router-bootstrap'
+import { Link } from 'react-router-dom'
+import '../screens/screens.css'
 
 const Paginate = ({ pages, page, isAdmin = false, keyword = '' }) => {
+  if (pages <= 1) return null
+
   return (
-    pages > 1 && (
-      <Pagination>
-        {[...Array(pages).keys()].map((x) => (
-          <LinkContainer
-            key={x + 1}
-            to={
-              !isAdmin
-                ? keyword
-                  ? `/search/${keyword}/page/${x + 1}`
-                  : `/page/${x + 1}`
-                : `/admin/productlist/${x + 1}`
-            }
+    <nav aria-label='Product pages' className='ps-pagination'>
+      {[...Array(pages).keys()].map((x) => {
+        const pageNum = x + 1
+        const to = !isAdmin
+          ? keyword
+            ? `/search/${keyword}/page/${pageNum}`
+            : `/page/${pageNum}`
+          : `/admin/productlist/${pageNum}`
+
+        return pageNum === page ? (
+          <span
+            key={pageNum}
+            className='ps-page-btn ps-page-btn--active'
+            aria-current='page'
+            aria-label={`Page ${pageNum}, current page`}
           >
-            <Pagination.Item active={x + 1 === page}>{x + 1}</Pagination.Item>
-          </LinkContainer>
-        ))}
-      </Pagination>
-    )
+            {pageNum}
+          </span>
+        ) : (
+          <Link
+            key={pageNum}
+            to={to}
+            className='ps-page-btn'
+            aria-label={`Go to page ${pageNum}`}
+          >
+            {pageNum}
+          </Link>
+        )
+      })}
+    </nav>
   )
 }
 

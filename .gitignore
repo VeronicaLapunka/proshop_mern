@@ -12,6 +12,9 @@ node_modules/
 # production
 /frontend/build
 
+# temporary files
+tmp/
+
 # misc
 .DS_Store
 .env
