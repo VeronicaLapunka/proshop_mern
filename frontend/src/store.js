@@ -28,7 +28,11 @@ import {
   orderListMyReducer,
   orderListReducer,
 } from './reducers/orderReducers'
-import { featureFlagListReducer } from './reducers/featureFlagReducers'
+import {
+  featureFlagListReducer,
+  featureFlagUpdateStatusReducer,
+  featureFlagUpdateTrafficReducer,
+} from './reducers/featureFlagReducers'
 
 const reducer = combineReducers({
   productList: productListReducer,
@@ -53,6 +57,8 @@ const reducer = combineReducers({
   orderListMy: orderListMyReducer,
   orderList: orderListReducer,
   featureFlagList: featureFlagListReducer,
+  featureFlagUpdateStatus: featureFlagUpdateStatusReducer,
+  featureFlagUpdateTraffic: featureFlagUpdateTrafficReducer,
 })
 
 const cartItemsFromStorage = localStorage.getItem('cartItems')

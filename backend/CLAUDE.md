@@ -57,3 +57,9 @@ The backend follows a traditional MVC pattern:
 - **`frontend/build/` is not committed** — must be produced by the build step. If missing, the production catch-all `res.sendFile(...)` will 404 every route.
 - **`uploads/` is ephemeral** — Multer saves images to `uploads/` on disk. On platforms with ephemeral filesystems (Heroku dynos, most containers) uploaded files are lost on restart. For production, replace Multer with cloud storage (S3, Cloudinary).
 - **No CORS middleware is installed** — the CRA dev proxy handles cross-origin during development; in production the Express server serves the React build from the same origin. If frontend and backend are ever on separate domains, add the `cors` package.
+
+## Design rules: see ./DESIGN.md
+
+## Design rules screens except FeatureDashboardScreen: see ./DESIGN_ACCESSIBILITY.md
+
+## Anti-slop rules: see ./ANTI_SLOP.md

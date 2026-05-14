@@ -3,8 +3,8 @@
     "name": "New Search Algorithm",
     "description": "Replaces legacy regex-based keyword matching with a hybrid BM25 + TF-IDF ranking pipeline. Improves relevance for multi-word queries and handles common misspellings via fuzzy matching. Backend: new productController search path; index built on name, brand, category, description fields.",
     "status": "Testing",
-    "traffic_percentage": 25,
-    "last_modified": "2026-05-10",
+    "traffic_percentage": 22,
+    "last_modified": "2026-05-14",
     "targeted_segments": [
       "beta_users",
       "internal"
@@ -122,9 +122,9 @@
   "apple_pay": {
     "name": "Apple Pay / Web Payments API",
     "description": "Enables the Web Payments Request API for Safari users on Apple devices. Shows an Apple Pay button on PaymentScreen alongside the existing PayPal option (the Stripe radio button currently commented out). Requires merchant domain verification and a Stripe payment processor backend.",
-    "status": "Disabled",
+    "status": "Enabled",
     "traffic_percentage": 0,
-    "last_modified": "2026-03-18",
+    "last_modified": "2026-05-14",
     "targeted_segments": [
       "safari_users",
       "mobile_ios"
