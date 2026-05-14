@@ -430,6 +430,33 @@ npm start                         # Start backend in production mode (serves fro
 
 ---
 
+## Redesigned Pages (HW4)
+
+All 16 screens have been redesigned with a custom WCAG 2.1 AA design system (`ps-` namespace), replacing Bootstrap components with native HTML + CSS.
+
+| #   | Page                         | Route                               | File                        | Видимость |    Сделал?     |
+| --- | ---------------------------- | ----------------------------------- | --------------------------- | --------- | :------------: |
+| 1   | Home / Search results        | `/`, `/search/:keyword`, `/page/:n` | `HomeScreen.js`             | public    |       ✅       |
+| 2   | Product details              | `/product/:id`                      | `ProductScreen.js`          | public    |       ✅       |
+| 3   | Cart                         | `/cart/:id?`                        | `CartScreen.js`             | public    |       ✅       |
+| 4   | Login                        | `/login`                            | `LoginScreen.js`            | public    |       ✅       |
+| 5   | Register                     | `/register`                         | `RegisterScreen.js`         | public    |       ✅       |
+| 6   | Profile                      | `/profile`                          | `ProfileScreen.js`          | auth      |       ✅       |
+| 7   | Shipping                     | `/shipping`                         | `ShippingScreen.js`         | auth      |       ✅       |
+| 8   | Payment                      | `/payment`                          | `PaymentScreen.js`          | auth      |       ✅       |
+| 9   | Place Order                  | `/placeorder`                       | `PlaceOrderScreen.js`       | auth      |       ✅       |
+| 10  | Order details                | `/order/:id`                        | `OrderScreen.js`            | auth      |       ✅       |
+| 11  | Admin: Users list            | `/admin/userlist`                   | `UserListScreen.js`         | admin     |       ✅       |
+| 12  | Admin: User edit             | `/admin/user/:id/edit`              | `UserEditScreen.js`         | admin     |       ✅       |
+| 13  | Admin: Products list         | `/admin/productlist`                | `ProductListScreen.js`      | admin     |       ✅       |
+| 14  | Admin: Product edit          | `/admin/product/:id/edit`           | `ProductEditScreen.js`      | admin     |       ✅       |
+| 15  | Admin: Orders list           | `/admin/orderlist`                  | `OrderListScreen.js`        | admin     |       ✅       |
+| 16  | **Admin: Feature Dashboard** | `/admin/featuredashboard`           | `FeatureDashboardScreen.js` | admin     | ✅ обязательно |
+
+Before/after screenshots for all pages: `tmp/screenshots/`.
+
+---
+
 ## Additional Resources
 
 - Backend code guidelines: See [backend/CLAUDE.md](backend/CLAUDE.md)
