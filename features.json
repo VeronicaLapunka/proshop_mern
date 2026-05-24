@@ -3,8 +3,8 @@
     "name": "New Search Algorithm",
     "description": "Replaces legacy regex-based keyword matching with a hybrid BM25 + TF-IDF ranking pipeline. Improves relevance for multi-word queries and handles common misspellings via fuzzy matching. Backend: new productController search path; index built on name, brand, category, description fields.",
     "status": "Testing",
-    "traffic_percentage": 22,
-    "last_modified": "2026-05-14",
+    "traffic_percentage": 85,
+    "last_modified": "2026-05-24",
     "targeted_segments": [
       "beta_users",
       "internal"
@@ -65,8 +65,8 @@
     "name": "Guest Cart Persistence Across Sessions",
     "description": "Extends localStorage cart state to survive browser tab closes and restores on next visit for unauthenticated users. Currently cart is already stored in localStorage but cleared on certain navigation paths. This flag enables the full recovery flow including a 'Welcome back — you left items in your cart' banner.",
     "status": "Enabled",
-    "traffic_percentage": 100,
-    "last_modified": "2026-01-15",
+    "traffic_percentage": 86,
+    "last_modified": "2026-05-23",
     "targeted_segments": [
       "guests"
     ],
@@ -89,9 +89,9 @@
   "multi_step_checkout_v2": {
     "name": "Redesigned Multi-Step Checkout",
     "description": "Replaces the current 4-step linear checkout (CheckoutSteps component) with a validated stepper that shows a progress indicator, allows backward navigation without data loss, and provides inline address validation. Shipping, payment, and order review are on separate animated panels rather than full page redirects.",
-    "status": "Testing",
-    "traffic_percentage": 20,
-    "last_modified": "2026-04-10",
+    "status": "Enabled",
+    "traffic_percentage": 62,
+    "last_modified": "2026-05-23",
     "targeted_segments": [
       "all"
     ],
@@ -261,9 +261,9 @@
   "code_splitting_optimisation": {
     "name": "Route-Level Code Splitting",
     "description": "Wraps all screen-level React components (CartScreen, AdminScreens, OrderScreen, etc.) with React.lazy + Suspense so each route is loaded as a separate JS chunk. Reduces initial bundle size from ~280 KB to ~90 KB for anonymous users who never visit admin routes.",
-    "status": "Testing",
+    "status": "Enabled",
     "traffic_percentage": 50,
-    "last_modified": "2026-04-18",
+    "last_modified": "2026-05-24",
     "targeted_segments": [
       "all"
     ],
@@ -272,9 +272,9 @@
   "dark_mode": {
     "name": "Dark Mode Theme",
     "description": "Adds a theme toggle to the Header component that switches the app between the default light Bootstrap theme and a dark palette. Preference is persisted to localStorage and respected on next visit. Requires overriding Bootstrap CSS custom properties; no backend changes.",
-    "status": "Testing",
-    "traffic_percentage": 20,
-    "last_modified": "2026-04-20",
+    "status": "Enabled",
+    "traffic_percentage": 0,
+    "last_modified": "2026-05-24",
     "targeted_segments": [
       "all"
     ],
@@ -285,7 +285,7 @@
     "description": "Allows unauthenticated users to complete a purchase without creating an account. A temporary guest token is issued at checkout start and associated with the order. Post-purchase, the user is offered account creation pre-filled with their shipping details. Reduces registration friction and recovers otherwise-lost sales.",
     "status": "Disabled",
     "traffic_percentage": 0,
-    "last_modified": "2026-03-25",
+    "last_modified": "2026-05-24",
     "targeted_segments": [
       "guests"
     ],

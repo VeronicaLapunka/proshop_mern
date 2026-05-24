@@ -1,0 +1,411 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "feature-control",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        48
+      ],
+      "id": "91ef9100-d72e-41b0-8f50-5cfd0edd70cf",
+      "name": "Webhook",
+      "webhookId": "f8860569-f6aa-4c4d-875d-0c22e2b2823f"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ JSON.stringify($json) }}  ",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        960,
+        64
+      ],
+      "id": "35548535-ea9b-4549-9492-87650be9f663",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "=={{ !$json.body.feature_id }}  ",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "daf98248-acb7-4db3-9ea7-cfcbc8c81981"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "missing_feature_id"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e6400189-21a7-4931-80e5-72893405634f",
+                    "leftValue": "=={{ !$json.body.action }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "missing_action"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5073ef1a-f34b-47ee-94d5-17adf7116d4f",
+                    "leftValue": "=={{ !['check','test','rollback','rollout'].includes($json.body.action) }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "invalid_action"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9e7165e2-50b0-44b4-b9dc-fedceb90ab7b",
+                    "leftValue": "=={{ $json.body.traffic_percentage !== undefined && ($json.body.traffic_percentage < 0 ||                         \n  $json.body.traffic_percentage > 100) }} ",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "invalid_traffic"
+            }
+          ]
+        },
+        "looseTypeValidation": "={{ false }}",
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        16
+      ],
+      "id": "ec97e459-7002-4492-bc42-aadbc6e9c132",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": " {\"success\": false, \"message\": \"Validation error\", \"rejected_at\": \"input-validation\"}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        160,
+        -64
+      ],
+      "id": "c8f8d2f9-96ef-43fe-9e8b-8307a6cbf64b",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=  ={{ JSON.stringify($json.body) }}  ",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Goal:\n  Выполни запрос пользователя по управлению feature flag {{ $json.body.feature_id }}.                                           \n                                                                                                                              \n  Context:\n  - Текущее состояние feature flag получи через get_feature_info ПЕРЕД любыми изменениями.\n  - Команда от UI: action={{ $json.body.action }}, target_state={{ $json.body.target_state }}, traffic_percentage={{            \n  $json.body.traffic_percentage }}.                                                                                             \n  - Доступные actions: \"check\", \"test\", \"rollback\", \"rollout\".                                                                  \n  - Available tools: get_feature_info, set_feature_state, adjust_traffic_rollout.                                               \n                                                                                                                                \n  Action:\n  1. Если action=\"check\" — вызови get_feature_info и верни результат.                                                           \n  2. Если action=\"test\" — get_feature_info → set_feature_state(Testing) → get_feature_info.                                     \n  3. Если action=\"rollback\" — get_feature_info → если уже Disabled, верни no_op → иначе set_feature_state(Disabled).            \n  4. Если action=\"rollout\" — get_feature_info → adjust_traffic_rollout(traffic_percentage) → get_feature_info.                  \n  5. Если invalid params — верни ошибку без вызова инструментов.                                                                \n                                                                                                                                \n  Output:                                                                                                                       \n  JSON строго по схеме:                                                                                                         \n  {\"success\": boolean, \"message\": string, \"current_state\": object|null, \"rejected_at\": string|null}                           \n                                                                                                                                \n  Constraints:\n  - traffic_percentage в диапазоне [0, 100].                                                                                    \n  - НЕ вызывай set_feature_state повторно если state уже соответствует целевому.   ",
+          "maxIterations": 5,
+          "returnIntermediateSteps": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        352,
+        48
+      ],
+      "id": "d264ccb8-71e2-4376-b009-af2f365f03af",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "~google/gemini-flash-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        144,
+        288
+      ],
+      "id": "bb042e6d-77eb-44fe-b610-f974303260aa",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "gFPYD2ZxR2Eddw0v",
+          "name": "OpenRouter account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "http://host.docker.internal:3001/mcp",
+        "authentication": "bearerAuth",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        496,
+        304
+      ],
+      "id": "ed0f620b-59c6-4702-bf1c-843af4267e35",
+      "name": "MCP Client",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "RrMrh7elIfQO2r9N",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=={{ $json.body.feature_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        352,
+        304
+      ],
+      "id": "2d776f8a-ea5d-4924-afb3-a65970523b99",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"required\": [\"success\", \"message\"],\n  \"properties\": {\n    \"success\": {\"type\": \"boolean\"},\n    \"message\": {\"type\": \"string\"},\n    \"current_state\": {\n      \"type\": [\"object\", \"null\"],\n      \"properties\": {\n        \"id\": {\"type\": \"string\"},\n        \"name\": {\"type\": \"string\"},\n        \"status\": {\"type\": \"string\", \"enum\": [\"Enabled\", \"Disabled\", \"Testing\"]},\n        \"traffic_percentage\": {\"type\": \"number\"},\n        \"last_modified\": {\"type\": \"string\"}\n      }\n    },\n    \"rejected_at\": {\"type\": [\"string\", \"null\"]}\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        624,
+        272
+      ],
+      "id": "971744f2-3a12-47b0-87ed-73acb29f170b",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "jsCode": "  const output = $input.first().json.output;                                                                                    \n  return [{                                                                                                                   \n    json: {\n      success: output.success,                                                                                                  \n      message: output.message,\n      current_state: output.current_state || null                                                                               \n    }                                                                                                                         \n  }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        48
+      ],
+      "id": "5b83fb38-faa4-4ec2-ba41-0ad8b566f5ed",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "74730078-2d4c-43b8-9353-cbeb60a114c3",
+  "meta": {
+    "instanceId": "66c68edf28f74c0d81ec66fb655f9784e24f13033a16421a94a39af827de1c8d"
+  },
+  "id": "ZuNZsu9FGgIoV8Qa",
+  "tags": []
+}

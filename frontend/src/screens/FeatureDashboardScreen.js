@@ -9,6 +9,7 @@ import {
   FEATURE_FLAG_UPDATE_STATUS_RESET,
   FEATURE_FLAG_UPDATE_TRAFFIC_RESET,
 } from '../constants/featureFlagConstants'
+import AutoPilotControls from '../components/AutoPilotControls'
 import './FeatureDashboard.css'
 
 /* ── Inline SVG icons (no emoji per anti-slop spec) ──────────── */
@@ -134,6 +135,7 @@ const FeatureDashboardScreen = ({ history }) => {
   const [updatingStatus, setUpdatingStatus] = useState(null)
   const [updatingTraffic, setUpdatingTraffic] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
+  const [selectedFeature, setSelectedFeature] = useState(null)
 
   const { userInfo } = useSelector((state) => state.userLogin)
   const { loading, error, features = [] } = useSelector((state) => state.featureFlagList)
@@ -195,6 +197,13 @@ const FeatureDashboardScreen = ({ history }) => {
 
   const handleTrafficChange = (featureId, value) => {
     setPendingTraffic((prev) => ({ ...prev, [featureId]: Number(value) }))
+  }
+
+  const handleAutoPilotUpdate = (newState) => {
+    dispatch(listFeatureFlags())
+    if (selectedFeature && newState) {
+      setSelectedFeature((prev) => ({ ...prev, ...newState }))
+    }
   }
 
   const handleTrafficCommit = async (feature) => {
@@ -342,12 +351,16 @@ const FeatureDashboardScreen = ({ history }) => {
             const isEnabled = feature.status === 'Enabled'
             const sliderCls = feature.status === 'Testing' ? 'fd-slider--testing' : ''
 
+            const isSelected = selectedFeature && selectedFeature.feature_id === feature.feature_id
+
             return (
               <article
-                className='fd-card'
+                className={`fd-card${isSelected ? ' fd-card--selected' : ''}`}
                 key={feature.feature_id}
                 role='listitem'
                 aria-label={feature.name}
+                onClick={() => setSelectedFeature(isSelected ? null : feature)}
+                style={{ cursor: 'pointer' }}
               >
                 {/* Header: id + name + badge */}
                 <div className='fd-card__header'>
@@ -470,6 +483,13 @@ const FeatureDashboardScreen = ({ history }) => {
           })
         )}
       </div>
+
+      {selectedFeature && (
+        <AutoPilotControls
+          feature={selectedFeature}
+          onUpdate={handleAutoPilotUpdate}
+        />
+      )}
     </div>
   )
 }

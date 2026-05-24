@@ -1,0 +1,387 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -368,
+        -128
+      ],
+      "id": "f0d5a761-58dd-4d8e-9685-3bdc4e50f068",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8765/logs.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -192,
+        -128
+      ],
+      "id": "c912e379-0d2c-40ad-a948-46615ed0cc40",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": " const logs = $input.all().map(item => item.json).filter(e => e && e.timestamp && e.status);\n\n  const now = Date.now();\n  const window_ms = 60 * 1000;\n  const recent = logs.filter(e => (now - new Date(e.timestamp).getTime()) < window_ms);\n\n  const total = recent.length;\n  const errors = recent.filter(e => e.status === 'error').length;\n  const error_rate = total > 0 ? errors / total : 0;\n\n  return [{ json: {\n    feature_id: 'search_v2',\n    error_rate: Math.round(error_rate * 1000) / 1000,\n    total,\n    errors\n  }}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        -128
+      ],
+      "id": "a1793460-d2e8-48ef-802e-085229b8a423",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "=http://host.docker.internal:5001/api/feature-flags/{{ $('Code in JavaScript').first().json.feature_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        144,
+        -128
+      ],
+      "id": "6d80a6f5-c9ed-4ae9-b1c5-9aece3c4936b",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const agg = $('Code in JavaScript').first().json;\n  const featureId = agg.feature_id;\n  const errorRate = agg.error_rate;\n  const currentStatus = $input.first().json[featureId].status;\n\n  let decision = 'noop';\n  if (errorRate > 0.05 && currentStatus !== 'Disabled') {\n    decision = 'deactivate';\n  } else if (errorRate < 0.01 && currentStatus === 'Disabled') {\n    decision = 're_enable';\n  }\n\n  return [{ json: { feature_id: featureId, error_rate: errorRate, current_status: currentStatus, decision } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -128
+      ],
+      "id": "20fb5802-696b-4bba-9839-0f5360935033",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "deactivate",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b421aac2-3a01-4bbd-9b9f-e213e9675694"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "3dd86915-a890-425e-a843-e6884ed7ae45",
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "re_enable",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        -144
+      ],
+      "id": "ebbc356f-b6d5-489e-8ec9-dd2e337b936f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=={{ JSON.stringify($json) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "= Decision is already made upstream by the Switch node. Your only job is to execute it via MCP tools.                           \n                                                                                                                                \n  Input:                                                                                                                        \n  - feature_id: {{ $json.feature_id }}                                                                                          \n  - decision: {{ $json.decision }}                                                                                              \n  - current_status: {{ $json.current_status }}                                                                                  \n  - error_rate: {{ $json.error_rate }}                                                                                          \n                                                                                                                                \n  Rules:\n  1. Always call get_feature_info first to verify current state.                                                                \n  2. If decision = \"deactivate\" → call set_feature_state(feature_id, \"Disabled\")                                                \n  3. If decision = \"re_enable\" → call set_feature_state(feature_id, \"Enabled\")                                                  \n  4. If current status already matches the target — skip set_feature_state, return success=true with message \"no-op: already in \n  target state\".                                                                                                                \n  5. Do NOT make up decisions. Do NOT call any tool not listed above.                                                         \n                                                                                                                                \n  Output strictly as JSON:                                                                                                    \n  {\"success\": boolean, \"message\": string, \"current_state\": object|null, \"rejected_at\": string|null} "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        608,
+        -288
+      ],
+      "id": "0518a720-7669-4fee-be5a-c0aafb086795",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "~google/gemini-flash-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        656,
+        0
+      ],
+      "id": "9f5fda8d-601b-4eec-a7a9-27da85adf0c7",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "gFPYD2ZxR2Eddw0v",
+          "name": "OpenRouter account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "http://host.docker.internal:3001/mcp",
+        "authentication": "bearerAuth",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        784,
+        64
+      ],
+      "id": "d139efae-4fda-425b-a97b-37f0b277bd01",
+      "name": "MCP Client",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "RrMrh7elIfQO2r9N",
+          "name": "Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": " {                                                                                                                             \n    \"type\": \"object\",                                                                                                         \n    \"required\": [\"success\", \"message\"],                                                                                         \n    \"properties\": {                                                                                                             \n      \"success\": {\"type\": \"boolean\"},\n      \"message\": {\"type\": \"string\"},                                                                                            \n      \"current_state\": {                                                                                                      \n        \"type\": [\"object\", \"null\"],                                                                                             \n        \"properties\": {\n          \"id\": {\"type\": \"string\"},                                                                                             \n          \"name\": {\"type\": \"string\"},                                                                                         \n          \"status\": {\"type\": \"string\", \"enum\": [\"Enabled\", \"Disabled\", \"Testing\"]},\n          \"traffic_percentage\": {\"type\": \"number\"},                                                                             \n          \"last_modified\": {\"type\": \"string\"}\n        }                                                                                                                       \n      },                                                                                                                      \n      \"rejected_at\": {\"type\": [\"string\", \"null\"]}                                                                               \n    }                                                                                                                         \n  }"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        864,
+        176
+      ],
+      "id": "40a67b4b-93f6-40db-b19c-2f880f924f40",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        608,
+        80
+      ],
+      "id": "75feb2d4-6b1a-497d-83e2-73d2f3b4daba",
+      "name": "No Operation"
+    },
+    {
+      "parameters": {
+        "chatId": "860065131",
+        "text": "={{ $json.output.message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -288
+      ],
+      "id": "e4c01d77-b3a9-43bd-a9f7-174beccbf0fc",
+      "name": "Send a text message",
+      "webhookId": "6f9873b3-7a4d-4bad-8220-bcd6405acac9",
+      "credentials": {
+        "telegramApi": {
+          "id": "N3EBPZHvEghqj6OQ",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "34faa492-df85-48d7-82f7-32056986719a",
+  "meta": {
+    "instanceId": "66c68edf28f74c0d81ec66fb655f9784e24f13033a16421a94a39af827de1c8d"
+  },
+  "id": "z7E7U0UkvZAFedgr",
+  "tags": []
+}
