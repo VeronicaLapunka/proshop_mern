@@ -8,10 +8,17 @@ const getProducts = asyncHandler(async (req, res) => {
   const pageSize = 10
   const page = Number(req.query.pageNumber) || 1
 
-  const keyword = req.query.keyword
+  // Sanitize keyword: cap length and escape regex metacharacters to prevent ReDoS
+  const rawKeyword = req.query.keyword
+  const safeKeyword =
+    rawKeyword && typeof rawKeyword === 'string'
+      ? rawKeyword.slice(0, 100).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      : null
+
+  const keyword = safeKeyword
     ? {
         name: {
-          $regex: req.query.keyword,
+          $regex: safeKeyword,
           $options: 'i',
         },
       }

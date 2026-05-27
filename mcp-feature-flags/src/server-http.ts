@@ -10,6 +10,7 @@
  *   Authentication: Bearer Token → value of MCP_API_KEY env var
  */
 import http from "http";
+import crypto from "crypto";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
@@ -22,7 +23,14 @@ import {
 } from "./helpers.js";
 
 const PORT = Number(process.env.MCP_HTTP_PORT) || 3001;
-const API_KEY = process.env.MCP_API_KEY || "rdg564gchdhd_dhdhd12gpoong";
+
+// Fail-fast: require MCP_API_KEY to be explicitly set — no hardcoded fallback.
+// If unset the server must not start; a missing key is a misconfiguration, not a default.
+if (!process.env.MCP_API_KEY) {
+  console.error("FATAL: MCP_API_KEY environment variable is required but not set. Exiting.");
+  process.exit(1);
+}
+const API_KEY = process.env.MCP_API_KEY;
 
 function createMcpServer(): McpServer {
   const server = new McpServer({ name: "feature-flags", version: "1.0.0" });
@@ -98,7 +106,10 @@ const httpServer = http.createServer(async (req, res) => {
   // Auth check
   const auth = req.headers["authorization"] ?? req.headers["x-api-key"] ?? "";
   const token = String(auth).replace(/^Bearer\s+/i, "");
-  if (token !== API_KEY) {
+  const tokenBuf = Buffer.from(token);
+  const keyBuf = Buffer.from(API_KEY);
+  const valid = tokenBuf.length === keyBuf.length && crypto.timingSafeEqual(tokenBuf, keyBuf);
+  if (!valid) {
     res.writeHead(401, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ error: "Unauthorized" }));
     return;
@@ -125,5 +136,5 @@ const httpServer = http.createServer(async (req, res) => {
 httpServer.listen(PORT, () => {
   console.log(`MCP HTTP server running on http://localhost:${PORT}/mcp`);
   console.log(`Health: http://localhost:${PORT}/health`);
-  console.log(`API key: ${API_KEY}`);
+  console.log(`API key: ${API_KEY.slice(0, 4)}${"*".repeat(Math.max(0, API_KEY.length - 4))} (set via MCP_API_KEY env var)`);
 });

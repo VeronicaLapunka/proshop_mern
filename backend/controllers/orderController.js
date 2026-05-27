@@ -47,6 +47,11 @@ const getOrderById = asyncHandler(async (req, res) => {
   )
 
   if (order) {
+    // Ownership check: only the order owner or an admin may view the order
+    if (order.user._id.toString() !== req.user._id.toString() && !req.user.isAdmin) {
+      res.status(401)
+      throw new Error('Not authorized to view this order')
+    }
     res.json(order)
   } else {
     res.status(404)
