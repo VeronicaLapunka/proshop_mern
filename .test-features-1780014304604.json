@@ -1,0 +1,44 @@
+{
+  "search_v2": {
+    "name": "New Search Algorithm",
+    "description": "Advanced search with BM25 ranking",
+    "status": "Testing",
+    "traffic_percentage": 50,
+    "last_modified": "2026-05-25",
+    "targeted_segments": [
+      "beta_users"
+    ],
+    "rollout_strategy": "canary"
+  },
+  "semantic_search": {
+    "name": "Semantic Vector Search",
+    "description": "Embedding-based semantic similarity",
+    "status": "Testing",
+    "traffic_percentage": 25,
+    "last_modified": "2026-05-20",
+    "dependencies": [
+      "search_v2"
+    ]
+  },
+  "dark_mode": {
+    "name": "Dark Mode",
+    "description": "Dark theme for the UI",
+    "status": "Disabled",
+    "traffic_percentage": 0,
+    "last_modified": "2026-05-22"
+  },
+  "cart_redesign": {
+    "name": "Redesigned Cart UI",
+    "description": "New cart interface",
+    "status": "Enabled",
+    "traffic_percentage": 100,
+    "last_modified": "2026-05-15"
+  },
+  "gift_message": {
+    "name": "Gift Message Feature",
+    "description": "Add gift messages to orders",
+    "status": "Testing",
+    "traffic_percentage": 40,
+    "last_modified": "2026-05-18"
+  }
+}

@@ -3,6 +3,73 @@
 This file provides guidance to Claude Code when working with this repository.
 See also: `backend/CLAUDE.md` (architecture, code review, deployment) and `frontend/CLAUDE.md` (architecture, Redux rules).
 
+---
+
+## ⭐ START HERE
+
+**New to this project?** Start with these three resources:
+
+1. **Quick Navigation**: [`docs/INDEX.md`](./docs/INDEX.md) — Hub for all 59 docs
+2. **Module Map**: [`docs/PROJECT_MAP.md`](./docs/PROJECT_MAP.md) — Human-readable directory (auto-generated)
+3. **Project Structure**: [`project-index.json`](./project-index.json) — Machine-readable catalog of all modules
+
+**For a specific question?** Use the MCP servers:
+- **Documentation search**: `search_project_docs("your question")` — semantic search across all docs
+- **Feature flags**: `get_feature_info("flag_name")` / `set_feature_state(...)` — query/modify flags in `features.json`
+
+**First time running the project?**
+- Install: `npm install && cd frontend && npm install && cd ..`
+- Setup MongoDB: `docker run -d -p 27017:27017 mongo:7`
+- Start dev: `npm run dev` (frontend :3000 + backend :5001)
+- Seed data: `npm run data:import` (add sample products + users)
+
+**Common gotchas:**
+- ⚠️ MongoDB must be running BEFORE `npm run dev` (no auto-retry)
+- ⚠️ Backend port is **5001** (not 5000 — macOS Control Center holds that)
+- ⚠️ Update `frontend/package.json` proxy if you change PORT in `.env`
+
+---
+
+## ⭐ Keeping project-index.json Current
+
+The living documentation system depends on keeping `project-index.json` synchronized with the actual codebase.
+
+**When to regenerate:**
+- After adding new backend routes or controllers
+- After adding new frontend screens or components
+- After modifying Redux domain structure
+- After updating `features.json` with new feature flags
+- After major code reorganization
+
+**How to regenerate:**
+```bash
+# Full regeneration from source code
+python3 update_project_index.py
+
+# Preview changes without writing
+python3 update_project_index.py --dry-run
+
+# Verbose output (show all discovered modules)
+python3 update_project_index.py --verbose
+
+# Validate all links in project-index.json
+python3 update_project_index.py --validate-only
+```
+
+**What gets tracked in the index:**
+- Backend: 3 models, 3 controllers, 5 route files, 2 middleware
+- Frontend: 16 screens, 13 components, 5 Redux domains
+- Features: 25 feature flags + 2 MCP servers
+- Architecture: ADRs, API endpoints, integration points
+
+The script works from repo root or `.claude/scripts/` directory and outputs:
+- `project-index.json` (7.2 KB) — machine-readable catalog
+- `docs/PROJECT_MAP.md` (4.6 KB) — human-readable navigation
+
+**File size stays reasonable:** The script only regenerates the index (7.2 KB); it doesn't bloat the repository.
+
+---
+
 ## Project Overview
 
 ProShop is a deprecated MERN (MongoDB, Express, React, Node.js) eCommerce platform:
@@ -169,3 +236,148 @@ When running any command, Claude Code will summarize:
 - **What it means** — practical impact on the dev environment
 - **Side effects** — ports occupied, data written, files changed
 - **What to do next** — required follow-up steps
+
+## Living Documentation System
+
+The project maintains a **single source of truth** for module discovery and cross-references via **`project-index.json`**.
+
+### Quick Reference
+
+- **Explore docs**: Start at [`docs/INDEX.md`](./docs/INDEX.md) (navigation hub)
+- **Module map**: See [`docs/PROJECT_MAP.md`](./docs/PROJECT_MAP.md) (human-readable, regenerated)
+- **Machine-readable index**: Use [`project-index.json`](./project-index.json) for scripts/tools
+- **Update the index**: Run `python3 update_project_index.py` after structural changes
+
+### What Gets Tracked
+
+**Backend modules:**
+- 3 Models (Product, User, Order)
+- 3 Controllers (product, user, order)
+- 5 Route files (26 endpoints)
+- 2 Middleware files
+
+**Frontend modules:**
+- 16 Screens (5 public, 5 auth, 6 admin)
+- 13 Components (reusable UI)
+- 5 Redux domains (product, user, order, cart, featureFlagFlag)
+
+**Feature & Operations:**
+- 25 Feature flags in `features.json`
+- 2 MCP servers (docs-search, feature-flags)
+- API endpoints (auth, products, orders, users, uploads)
+- Runbooks, incidents, ADRs
+
+### Running the Update Script
+
+```bash
+# Full regeneration from source code
+python3 update_project_index.py
+
+# Preview changes without writing
+python3 update_project_index.py --dry-run
+
+# Verbose output (show all discovered modules)
+python3 update_project_index.py --verbose
+
+# Validate all links in project-index.json
+python3 update_project_index.py --validate-only
+```
+
+The script works from repo root or from `.claude/scripts/` directory. Output:
+- `project-index.json` (7.2 KB, machine-readable catalog)
+- `docs/PROJECT_MAP.md` (4.6 KB, human-readable navigation)
+
+---
+
+## AI Agent Integration Points
+
+This project uses **AI agents** to automate documentation and development tasks. Integration points:
+
+### MCP Servers
+
+**1. `mcp-docs-search`** — RAG-powered documentation search
+- Location: `mcp-docs-search/` (TypeScript)
+- Tool: `search_project_docs(query)` — semantic search across all docs
+- Use case: Finding relevant documentation chunks, ADRs, API specs
+- Response format: `{ source_file, score, snippet }`
+
+**2. `mcp-feature-flags`** — Feature flag management
+- Location: `mcp-feature-flags/` (TypeScript)
+- Tools:
+  - `get_feature_info(flag_name)` — Query feature status
+  - `set_feature_state(flag_name, state)` — Change feature state
+  - `adjust_traffic_rollout(flag_name, percentage)` — Adjust rollout %
+  - `list_features()` — List all flags
+- Data source: `features.json`
+
+### Agent Workflow (from `legacy-auditor-mate.md`)
+
+1. **Discovery Phase**: Scan backend/, frontend/, features.json, MCP servers
+2. **Audit Phase**: Classify 59 existing docs with verdicts (✅/🔄/📦/❌)
+3. **Planning Phase**: Design living documentation strategy
+4. **Dispatch Phase**: Delegate to specialist agents (architecture, security, performance)
+5. **Aggregate Phase**: Build project-index.json + living docs system
+6. **Automate Phase**: Install update_project_index.py + optional hooks
+
+**Agent definitions**: See `.claude/agents/` (YAML + markdown templates)
+
+---
+
+## Documentation Audit Reference
+
+**Date:** 2026-05-29
+**Audit scope:** 59 documentation files (9 ADRs, 39 project docs, 3 M2 tests, 5 root guides, 2 MCP servers)
+**Audit output:** `homework-m6/stage3-living-docs/01-docs-audit.md`
+
+### Verdicts Applied
+
+| Count | Verdict | Action | Examples |
+|-------|---------|--------|----------|
+| 19 | ✅ ACCURATE | Keep as-is | ADRs, API specs, features, incidents, glossary |
+| 9 | 🔄 PARTIALLY ACCURATE | Update + keep | Pages (post-redesign), runbooks, architecture.md |
+| 7 | 📦 HISTORICAL | Archive | m2-char-tests/, report.md, dev-history context |
+| 1 | ❌ STALE | Archive | features-analysis-ru.md (language/scope unclear) |
+
+### Archive Locations
+
+- **Archived (historical)**: `docs/archived-2026-05-28/`
+  - `m2-char-tests/` (characterization test suite)
+  - `report.md` (M2 milestone snapshot)
+  - `features-analysis-ru.md` (legacy analysis)
+
+- **Deferred (placeholders)**: `docs/deferred-2026-05-28/`
+  - `ab-test-setup.md` (A/B testing runbook, not implemented)
+  - `feature-flag-toggle.md` (feature control runbook, not implemented)
+
+### TODO Markers Added
+
+Stale sections marked with `TODO(audit-2026-05-28)`:
+- All 14 page docs in `docs/project-data/pages/`
+- `docs/project-data/architecture.md` (missing MCP servers section)
+- `docs/project-data/glossary.md` (missing feature flag terminology)
+
+---
+
+## Architecture Reference
+
+**For detailed architecture specs**, see:
+
+1. **Backend**: `backend/CLAUDE.md`
+   - MVC pattern (routes, controllers, models)
+   - Error handling via asyncHandler + middleware
+   - JWT authentication flow
+   - ES Modules with `.js` extensions
+
+2. **Frontend**: `frontend/CLAUDE.md`
+   - Redux state management (5 domains)
+   - Thunk-based API actions
+   - Manual token extraction (no interceptors)
+   - localStorage persistence
+
+3. **Full Architecture**: `homework-m6/stage3-living-docs/02-architecture-specs.md`
+   - Module reverse-engineering specs
+   - Integration points (backend ↔ frontend, MCP servers)
+   - Feature flags system design
+   - RAG documentation pipeline
+
+4. **Project Structure**: See [`docs/INDEX.md`](./docs/INDEX.md) for navigation

@@ -2,9 +2,9 @@
   "search_v2": {
     "name": "New Search Algorithm",
     "description": "Replaces legacy regex-based keyword matching with a hybrid BM25 + TF-IDF ranking pipeline. Improves relevance for multi-word queries and handles common misspellings via fuzzy matching. Backend: new productController search path; index built on name, brand, category, description fields.",
-    "status": "Testing",
-    "traffic_percentage": 85,
-    "last_modified": "2026-05-24",
+    "status": "Disabled",
+    "traffic_percentage": 0,
+    "last_modified": "2026-05-29",
     "targeted_segments": [
       "beta_users",
       "internal"
@@ -15,8 +15,8 @@
     "name": "Semantic Vector Search",
     "description": "Augments keyword search with embedding-based semantic similarity. Products are encoded at index time; queries are embedded at runtime and matched via cosine similarity. Requires search_v2 to be Enabled first. Significantly improves discovery for natural-language queries like 'good headphones for running'.",
     "status": "Testing",
-    "traffic_percentage": 25,
-    "last_modified": "2026-05-11",
+    "traffic_percentage": 10,
+    "last_modified": "2026-05-29",
     "targeted_segments": [
       "internal"
     ],
@@ -40,8 +40,8 @@
     "name": "Redesigned Cart UI",
     "description": "Replaces the current two-column CartScreen layout with a streamlined single-page cart with inline quantity editing, animated item removal, and a persistent sticky order summary sidebar. Reduces the number of clicks needed to proceed to checkout by 40% in internal testing.",
     "status": "Testing",
-    "traffic_percentage": 10,
-    "last_modified": "2026-04-01",
+    "traffic_percentage": 50,
+    "last_modified": "2026-05-29",
     "targeted_segments": [
       "beta_users"
     ],
@@ -100,9 +100,9 @@
   "gift_message": {
     "name": "Gift Message at Checkout",
     "description": "Adds an optional gift message textarea on the PlaceOrderScreen. The message is stored on the Order document (orderModel extension: giftMessage: String) and printed on the packing slip. Increases average order value for gift-occasion purchases.",
-    "status": "Disabled",
-    "traffic_percentage": 0,
-    "last_modified": "2026-02-20",
+    "status": "Enabled",
+    "traffic_percentage": 100,
+    "last_modified": "2026-05-29",
     "targeted_segments": [
       "all"
     ],
@@ -273,8 +273,8 @@
     "name": "Dark Mode Theme",
     "description": "Adds a theme toggle to the Header component that switches the app between the default light Bootstrap theme and a dark palette. Preference is persisted to localStorage and respected on next visit. Requires overriding Bootstrap CSS custom properties; no backend changes.",
     "status": "Enabled",
-    "traffic_percentage": 0,
-    "last_modified": "2026-05-24",
+    "traffic_percentage": 100,
+    "last_modified": "2026-05-29",
     "targeted_segments": [
       "all"
     ],

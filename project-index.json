@@ -1,0 +1,281 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "last_updated": "2026-05-29T14:30:00Z",
+    "generated_by": "update_project_index.py",
+    "repository": "proshop_mern",
+    "audit_scope": "M3-M5 modules",
+    "note": "Living documentation system \u2014 single source of truth for module discovery"
+  },
+  "hard_rules": [
+    "ALWAYS read project-index.json FIRST for module discovery and dependency mapping",
+    "Backend uses ES Modules with .js extensions required (NO import './file' \u2014 must use './file.js')",
+    "Frontend Redux pattern: actions file \u2192 thunks with manual JWT extraction \u2192 reducers",
+    "All feature flag queries route through MCP server tools (list_features, get_feature_info) NOT direct JSON edits",
+    "MCP docs-search provides semantic search; Grep/Read are fallback only when vector search score < 0.6",
+    "MongoDB must be running before npm run dev; no retry logic \u2014 fails immediately",
+    "JWT stored in localStorage; expires 30 days; auto-logout matches exact string 'Not authorized, token failed'",
+    "Known bugs NOT FIXED: /api/products/top route ordering bug, paymentMethod lost on refresh, orderDetailsReducer starts with loading:true"
+  ],
+  "ai_routing": {
+    "feature_flag_queries": {
+      "pattern": "status of feature X / enable feature Y / set traffic Z%",
+      "route_to": "mcp-feature-flags server",
+      "tools": [
+        "list_features",
+        "get_feature_info",
+        "set_feature_state",
+        "adjust_traffic_rollout"
+      ]
+    },
+    "documentation_search": {
+      "pattern": "find docs about X / where is architecture Y / look up runbook Z",
+      "route_to": "mcp-docs-search server (RAG-based semantic search)",
+      "tools": [
+        "search_project_docs"
+      ]
+    },
+    "backend_architecture": {
+      "pattern": "how does routing work / auth middleware / error handling",
+      "route_to": "backend/CLAUDE.md + docs/adr/",
+      "reference_files": [
+        "backend/CLAUDE.md",
+        "docs/adr/0001-jwt-header-injection.md"
+      ]
+    },
+    "frontend_state_management": {
+      "pattern": "Redux domain structure / thunk action pattern / localStorage persistence",
+      "route_to": "frontend/CLAUDE.md + project-index.json#frontend.redux_domains",
+      "reference_files": [
+        "frontend/CLAUDE.md",
+        "frontend/src/actions/",
+        "frontend/src/reducers/"
+      ]
+    }
+  },
+  "system_folders": {
+    "project_root": {
+      "path": ".",
+      "purpose": "ProShop MERN fork with M3-M5 enhancements"
+    },
+    "backend": {
+      "path": "backend/",
+      "purpose": "Express.js REST API, ES Modules, port 5001"
+    },
+    "frontend": {
+      "path": "frontend/",
+      "purpose": "React + Redux UI, port 3000"
+    },
+    "mcp_servers": {
+      "path": "mcp-feature-flags/ + mcp-docs-search/",
+      "purpose": "Model Context Protocol servers"
+    },
+    "documentation": {
+      "path": "docs/",
+      "purpose": "Living documentation: ADRs, API specs, features, runbooks, incidents"
+    },
+    "archived_docs": {
+      "path": "docs/archived-2026-05-28/",
+      "purpose": "Historical documentation"
+    },
+    "deferred_docs": {
+      "path": "docs/deferred-2026-05-28/",
+      "purpose": "Placeholder runbooks"
+    },
+    "ai_config": {
+      "path": ".claude/",
+      "purpose": "AI agent configuration and automation"
+    },
+    "homework": {
+      "path": "homework-m6/",
+      "purpose": "M6 milestone deliverables (Stages 1-4)"
+    },
+    "features_store": {
+      "path": "features.json",
+      "purpose": "Feature flags data store"
+    }
+  },
+  "subprojects": [
+    {
+      "name": "mcp-feature-flags",
+      "path": "mcp-feature-flags/",
+      "type": "MCP Server (TypeScript)",
+      "description": "Feature flag management server with 4 tools",
+      "data_source": "features.json (root)",
+      "entry_point": "mcp-feature-flags/src/server.ts",
+      "dependencies": [
+        "features.json"
+      ],
+      "integrations": [
+        "backend/routes/featureFlagRoutes.js",
+        "frontend/src/screens/FeatureDashboardScreen.js"
+      ]
+    },
+    {
+      "name": "mcp-docs-search",
+      "type": "MCP Server (TypeScript)",
+      "path": "mcp-docs-search/",
+      "description": "RAG-based semantic documentation search",
+      "data_source": "docs/chunks.jsonl",
+      "entry_point": "mcp-docs-search/src/server.ts",
+      "dependencies": [
+        "docs/chunks.jsonl",
+        "qdrant (external)"
+      ]
+    },
+    {
+      "name": "backend",
+      "type": "Express.js REST API (JavaScript ES Modules)",
+      "path": "backend/",
+      "description": "REST API with 3 models, 5 routes, 2 middleware",
+      "entry_point": "backend/server.js",
+      "port": 5001,
+      "models": 3,
+      "controllers": 3,
+      "routes": 5,
+      "middleware": 2,
+      "dependencies": [
+        "MongoDB",
+        "features.json"
+      ]
+    },
+    {
+      "name": "frontend",
+      "type": "React + Redux (JavaScript, CommonJS)",
+      "path": "frontend/",
+      "description": "React SPA with 16 screens, 13 components, 5 Redux domains",
+      "entry_point": "frontend/src/index.js",
+      "port": 3000,
+      "screens": 16,
+      "components": 13,
+      "redux_domains": 5
+    }
+  ],
+  "filesystem_tree": {
+    "proshop_mern": {
+      "backend": {
+        "models": [
+          "3 files"
+        ],
+        "controllers": [
+          "3 files"
+        ],
+        "routes": [
+          "5 files"
+        ],
+        "middleware": [
+          "2 files"
+        ]
+      },
+      "frontend": {
+        "src": {
+          "screens": [
+            "16 files"
+          ],
+          "components": [
+            "13 files"
+          ],
+          "actions": [
+            "5 files"
+          ],
+          "reducers": [
+            "5 files"
+          ]
+        }
+      },
+      "mcp-feature-flags": {
+        "src": [
+          "server.ts",
+          "helpers.ts",
+          "server-http.ts"
+        ]
+      },
+      "mcp-docs-search": {
+        "src": [
+          "server.ts",
+          "search.ts"
+        ]
+      },
+      "docs": {
+        "adr": [
+          "9 ADRs"
+        ],
+        "project-data": [
+          "39 files"
+        ],
+        "archived": [
+          "3 files"
+        ],
+        "deferred": [
+          "2 files"
+        ]
+      },
+      ".claude": {
+        "agents": [
+          "legacy-auditor-mate.md"
+        ],
+        "scripts": [
+          "update_project_index.py"
+        ]
+      },
+      "homework-m6": {
+        "stages": [
+          "1-4 complete"
+        ]
+      },
+      "root_files": [
+        "project-index.json",
+        "features.json",
+        "CLAUDE.md",
+        "package.json"
+      ]
+    }
+  },
+  "dependencies": {
+    "backend_to_frontend": {
+      "type": "REST API over HTTP",
+      "protocol": "/api/*"
+    },
+    "backend_to_database": {
+      "type": "Mongoose ODM",
+      "target": "MongoDB"
+    },
+    "frontend_to_mcp_features": {
+      "type": "Feature flag state queries"
+    },
+    "ai_agents_to_mcp_servers": {
+      "type": "Model Context Protocol"
+    }
+  },
+  "cross_references": {
+    "known_bugs": [
+      {
+        "title": "/api/products/top CastError",
+        "status": "NOT FIXED"
+      },
+      {
+        "title": "paymentMethod lost on refresh",
+        "status": "NOT FIXED"
+      },
+      {
+        "title": "orderDetailsReducer loading:true",
+        "status": "INTENTIONAL"
+      }
+    ],
+    "auth_pattern": {
+      "description": "JWT authentication",
+      "storage": "localStorage",
+      "expiration": "30 days"
+    },
+    "error_handling": {
+      "backend": "asyncHandler + error middleware",
+      "frontend": "Redux _FAIL actions"
+    }
+  },
+  "specs": {
+    "backend_routing_spec": "docs/specs/backend-routing-spec.md",
+    "frontend_redux_spec": "docs/specs/frontend-redux-spec.md",
+    "features_spec": "docs/specs/features-spec.md",
+    "mcp_search_spec": "docs/specs/mcp-search-spec.md"
+  }
+}

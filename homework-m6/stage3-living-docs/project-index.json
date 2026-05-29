@@ -1,0 +1,517 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "generated_at": "2026-05-28T22:48:57.549042Z",
+    "generated_by": "update_project_index.py",
+    "repository": "proshop_mern",
+    "audit_scope": "M3-M5 modules"
+  },
+  "backend": {
+    "base_path": "backend/",
+    "language": "JavaScript (ES Modules)",
+    "entry_point": "backend/server.js",
+    "models": [
+      {
+        "name": "order",
+        "file": "backend/models/orderModel.js"
+      },
+      {
+        "name": "product",
+        "file": "backend/models/productModel.js"
+      },
+      {
+        "name": "user",
+        "file": "backend/models/userModel.js"
+      }
+    ],
+    "controllers": [
+      {
+        "name": "orderController",
+        "file": "backend/controllers/orderController.js"
+      },
+      {
+        "name": "productController",
+        "file": "backend/controllers/productController.js"
+      },
+      {
+        "name": "userController",
+        "file": "backend/controllers/userController.js"
+      }
+    ],
+    "routes": [
+      {
+        "name": "featureFlagRoutes",
+        "file": "backend/routes/featureFlagRoutes.js",
+        "base_path": "/api/featureFlag",
+        "endpoints": 4
+      },
+      {
+        "name": "orderRoutes",
+        "file": "backend/routes/orderRoutes.js",
+        "base_path": "/api/order",
+        "endpoints": "N/A"
+      },
+      {
+        "name": "productRoutes",
+        "file": "backend/routes/productRoutes.js",
+        "base_path": "/api/product",
+        "endpoints": 1
+      },
+      {
+        "name": "uploadRoutes",
+        "file": "backend/routes/uploadRoutes.js",
+        "base_path": "/api/upload",
+        "endpoints": 1
+      },
+      {
+        "name": "userRoutes",
+        "file": "backend/routes/userRoutes.js",
+        "base_path": "/api/user",
+        "endpoints": 1
+      }
+    ],
+    "middleware": [
+      {
+        "name": "authMiddleware",
+        "file": "backend/middleware/authMiddleware.js"
+      },
+      {
+        "name": "errorMiddleware",
+        "file": "backend/middleware/errorMiddleware.js"
+      }
+    ],
+    "total_endpoints": 7
+  },
+  "frontend": {
+    "base_path": "frontend/src/",
+    "framework": "React 17 + Redux",
+    "screens": [
+      {
+        "name": "CartScreen",
+        "file": "frontend/src/screens/CartScreen.js",
+        "type": "public"
+      },
+      {
+        "name": "FeatureDashboardScreen",
+        "file": "frontend/src/screens/FeatureDashboardScreen.js",
+        "type": "public"
+      },
+      {
+        "name": "HomeScreen",
+        "file": "frontend/src/screens/HomeScreen.js",
+        "type": "public"
+      },
+      {
+        "name": "LoginScreen",
+        "file": "frontend/src/screens/LoginScreen.js",
+        "type": "auth"
+      },
+      {
+        "name": "OrderListScreen",
+        "file": "frontend/src/screens/OrderListScreen.js",
+        "type": "public"
+      },
+      {
+        "name": "OrderScreen",
+        "file": "frontend/src/screens/OrderScreen.js",
+        "type": "public"
+      },
+      {
+        "name": "PaymentScreen",
+        "file": "frontend/src/screens/PaymentScreen.js",
+        "type": "public"
+      },
+      {
+        "name": "PlaceOrderScreen",
+        "file": "frontend/src/screens/PlaceOrderScreen.js",
+        "type": "public"
+      },
+      {
+        "name": "ProductEditScreen",
+        "file": "frontend/src/screens/ProductEditScreen.js",
+        "type": "public"
+      },
+      {
+        "name": "ProductListScreen",
+        "file": "frontend/src/screens/ProductListScreen.js",
+        "type": "public"
+      },
+      {
+        "name": "ProductScreen",
+        "file": "frontend/src/screens/ProductScreen.js",
+        "type": "public"
+      },
+      {
+        "name": "ProfileScreen",
+        "file": "frontend/src/screens/ProfileScreen.js",
+        "type": "auth"
+      },
+      {
+        "name": "RegisterScreen",
+        "file": "frontend/src/screens/RegisterScreen.js",
+        "type": "auth"
+      },
+      {
+        "name": "ShippingScreen",
+        "file": "frontend/src/screens/ShippingScreen.js",
+        "type": "public"
+      },
+      {
+        "name": "UserEditScreen",
+        "file": "frontend/src/screens/UserEditScreen.js",
+        "type": "public"
+      },
+      {
+        "name": "UserListScreen",
+        "file": "frontend/src/screens/UserListScreen.js",
+        "type": "public"
+      }
+    ],
+    "components": [
+      {
+        "name": "AutoPilotControls",
+        "file": "frontend/src/components/AutoPilotControls.js"
+      },
+      {
+        "name": "CheckoutSteps",
+        "file": "frontend/src/components/CheckoutSteps.js"
+      },
+      {
+        "name": "Footer",
+        "file": "frontend/src/components/Footer.js"
+      },
+      {
+        "name": "FormContainer",
+        "file": "frontend/src/components/FormContainer.js"
+      },
+      {
+        "name": "Header",
+        "file": "frontend/src/components/Header.js"
+      },
+      {
+        "name": "Loader",
+        "file": "frontend/src/components/Loader.js"
+      },
+      {
+        "name": "Message",
+        "file": "frontend/src/components/Message.js"
+      },
+      {
+        "name": "Meta",
+        "file": "frontend/src/components/Meta.js"
+      },
+      {
+        "name": "Paginate",
+        "file": "frontend/src/components/Paginate.js"
+      },
+      {
+        "name": "Product",
+        "file": "frontend/src/components/Product.js"
+      },
+      {
+        "name": "ProductCarousel",
+        "file": "frontend/src/components/ProductCarousel.js"
+      },
+      {
+        "name": "Rating",
+        "file": "frontend/src/components/Rating.js"
+      },
+      {
+        "name": "SearchBox",
+        "file": "frontend/src/components/SearchBox.js"
+      }
+    ],
+    "redux_domains": [
+      {
+        "name": "cart",
+        "actions_file": "frontend/src/actions/cartActions.js",
+        "reducers_file": "frontend/src/reducers/cartReducers.js"
+      },
+      {
+        "name": "featureflag",
+        "actions_file": "frontend/src/actions/featureFlagActions.js",
+        "reducers_file": "frontend/src/reducers/featureFlagReducers.js"
+      },
+      {
+        "name": "order",
+        "actions_file": "frontend/src/actions/orderActions.js",
+        "reducers_file": "frontend/src/reducers/orderReducers.js"
+      },
+      {
+        "name": "product",
+        "actions_file": "frontend/src/actions/productActions.js",
+        "reducers_file": "frontend/src/reducers/productReducers.js"
+      },
+      {
+        "name": "user",
+        "actions_file": "frontend/src/actions/userActions.js",
+        "reducers_file": "frontend/src/reducers/userReducers.js"
+      }
+    ]
+  },
+  "features": {
+    "total_count": 25,
+    "file": "features.json",
+    "flags": [
+      "search_v2",
+      "semantic_search",
+      "search_autosuggest",
+      "cart_redesign",
+      "save_for_later",
+      "guest_cart_persistence",
+      "express_checkout",
+      "multi_step_checkout_v2",
+      "gift_message",
+      "paypal_express_buttons"
+    ]
+  },
+  "mcp_servers": [
+    {
+      "name": "mcp-docs-search",
+      "path": "mcp-docs-search/",
+      "language": "TypeScript",
+      "tools": [
+        "search_project_docs"
+      ]
+    },
+    {
+      "name": "mcp-feature-flags",
+      "path": "mcp-feature-flags/",
+      "language": "TypeScript",
+      "tools": [
+        "list_features",
+        "get_feature_info",
+        "set_feature_state",
+        "adjust_traffic_rollout"
+      ]
+    }
+  ],
+  "specs": {
+    "base_path": "docs-new/specs/",
+    "modules": [
+      {
+        "name": "backend-routing-spec",
+        "file": "docs-new/specs/backend-routing-spec.md",
+        "title": "Backend Express Routing + Middleware Orchestration",
+        "covers": [
+          "backend/server.js",
+          "backend/routes/*",
+          "backend/middleware/*"
+        ],
+        "key_topics": [
+          "Express.js routing",
+          "middleware chain",
+          "JWT authentication (protect, admin)",
+          "asyncHandler error handling",
+          "5 route groups (products, users, orders, uploads, featureFlags)"
+        ]
+      },
+      {
+        "name": "frontend-redux-spec",
+        "file": "docs-new/specs/frontend-redux-spec.md",
+        "title": "Frontend Redux State Management + Thunk Actions",
+        "covers": [
+          "frontend/src/store.js",
+          "frontend/src/actions/*",
+          "frontend/src/reducers/*"
+        ],
+        "key_topics": [
+          "Redux domains (product, user, order, cart, featureflag)",
+          "Thunk action creators",
+          "manual JWT token extraction",
+          "localStorage persistence",
+          "error handling pattern"
+        ]
+      },
+      {
+        "name": "features-spec",
+        "file": "docs-new/specs/features-spec.md",
+        "title": "Feature Flags System (features.json + MCP server)",
+        "covers": [
+          "features.json",
+          "mcp-feature-flags/",
+          "backend/routes/featureFlagRoutes.js"
+        ],
+        "key_topics": [
+          "25 feature flags",
+          "flag status (active, testing, archived)",
+          "traffic percentage rollout",
+          "MCP server tools",
+          "frontend integration via Redux"
+        ]
+      },
+      {
+        "name": "mcp-search-spec",
+        "file": "docs-new/specs/mcp-search-spec.md",
+        "title": "MCP Docs-Search Integration (RAG Pipeline)",
+        "covers": [
+          "mcp-docs-search/",
+          "docs/chunks.jsonl"
+        ],
+        "key_topics": [
+          "semantic search over 60 docs",
+          "vector embeddings",
+          "RAG pipeline",
+          "search_project_docs tool",
+          "indexed documentation files"
+        ]
+      }
+    ]
+  },
+  "dependencies": {
+    "backend_integration": [
+      {
+        "from": "backend/routes/*",
+        "to": "backend/controllers/*",
+        "relationship": "Route → Controller (handler)"
+      },
+      {
+        "from": "backend/controllers/*",
+        "to": "backend/models/*",
+        "relationship": "Controller → Model (data access)"
+      },
+      {
+        "from": "backend/routes/*",
+        "to": "backend/middleware/*",
+        "relationship": "Route chain (protect, admin)"
+      },
+      {
+        "from": "backend/server.js",
+        "to": "backend/routes/*",
+        "relationship": "Server mounts all route groups"
+      }
+    ],
+    "frontend_integration": [
+      {
+        "from": "frontend/src/screens/*",
+        "to": "frontend/src/actions/*",
+        "relationship": "Screen dispatches thunk actions"
+      },
+      {
+        "from": "frontend/src/actions/*",
+        "to": "frontend/src/reducers/*",
+        "relationship": "Action creators dispatch reducer actions"
+      },
+      {
+        "from": "frontend/src/screens/*",
+        "to": "frontend/src/components/*",
+        "relationship": "Screen renders reusable components"
+      },
+      {
+        "from": "frontend/src/store.js",
+        "to": "frontend/src/reducers/*",
+        "relationship": "Store combines all reducer domains"
+      }
+    ],
+    "api_integration": [
+      {
+        "from": "frontend/src/actions/*",
+        "to": "/api/products",
+        "backend": "backend/routes/productRoutes.js",
+        "relationship": "Frontend Redux thunk calls backend API"
+      },
+      {
+        "from": "frontend/src/actions/*",
+        "to": "/api/users",
+        "backend": "backend/routes/userRoutes.js",
+        "relationship": "Frontend Redux thunk calls backend API"
+      },
+      {
+        "from": "frontend/src/actions/*",
+        "to": "/api/orders",
+        "backend": "backend/routes/orderRoutes.js",
+        "relationship": "Frontend Redux thunk calls backend API"
+      },
+      {
+        "from": "frontend/src/actions/featureFlagActions.js",
+        "to": "/api/featureFlag",
+        "backend": "backend/routes/featureFlagRoutes.js",
+        "relationship": "Feature flags fetched on app init"
+      }
+    ],
+    "feature_flags_integration": [
+      {
+        "from": "features.json",
+        "to": "backend/routes/featureFlagRoutes.js",
+        "relationship": "Routes serve feature flag data"
+      },
+      {
+        "from": "backend/routes/featureFlagRoutes.js",
+        "to": "frontend/src/reducers/featureFlagReducers.js",
+        "relationship": "Backend API → Frontend Redux state"
+      },
+      {
+        "from": "frontend/src/reducers/featureFlagReducers.js",
+        "to": "frontend/src/screens/*",
+        "relationship": "Screens conditionally render based on flags"
+      },
+      {
+        "from": "features.json",
+        "to": "mcp-feature-flags/",
+        "relationship": "MCP server reads/manages feature flags"
+      }
+    ],
+    "mcp_integration": [
+      {
+        "component": "mcp-docs-search",
+        "integrates_with": "docs/",
+        "tool": "search_project_docs",
+        "relationship": "Semantic search over all project documentation"
+      },
+      {
+        "component": "mcp-feature-flags",
+        "integrates_with": "features.json",
+        "tools": [
+          "list_features",
+          "get_feature_info",
+          "set_feature_state",
+          "adjust_traffic_rollout"
+        ],
+        "relationship": "Programmatic feature flag management"
+      }
+    ]
+  },
+  "cross_references": {
+    "known_bugs": [
+      {
+        "bug": "/api/products/top CastError",
+        "file": "backend/routes/productRoutes.js",
+        "cause": "Static route /top registered after parametric /:id",
+        "status": "Not fixed",
+        "spec": "docs-new/specs/backend-routing-spec.md"
+      },
+      {
+        "bug": "paymentMethod lost on refresh",
+        "files": [
+          "frontend/src/reducers/cartReducers.js",
+          "frontend/src/store.js"
+        ],
+        "cause": "localStorage persisted but Redux initialState missing paymentMethod",
+        "status": "Not fixed",
+        "spec": "docs-new/specs/frontend-redux-spec.md"
+      }
+    ],
+    "authentication": [
+      {
+        "pattern": "JWT token in Authorization: Bearer <token> header",
+        "implemented_in": [
+          "backend/middleware/authMiddleware.js (verify side)",
+          "frontend/src/actions/* (extraction side)"
+        ],
+        "spec": "docs-new/specs/backend-routing-spec.md, frontend-redux-spec.md"
+      }
+    ],
+    "error_handling": [
+      {
+        "pattern": "asyncHandler wrapper + error middleware",
+        "implemented_in": "backend/middleware/errorMiddleware.js",
+        "spec": "docs-new/specs/backend-routing-spec.md"
+      },
+      {
+        "pattern": "error.response?.data.message ?? error.message",
+        "implemented_in": "frontend/src/actions/*",
+        "spec": "docs-new/specs/frontend-redux-spec.md"
+      }
+    ]
+  }
+}
