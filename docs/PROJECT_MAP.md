@@ -1,6 +1,6 @@
 # ProShop MERN — Project Map
 
-Generated: 2026-05-29T00:40:36.776282Z
+Generated: 2026-06-03T07:55:42.799596Z
 Source: `project-index.json` (machine-readable module catalog)
 
 ---

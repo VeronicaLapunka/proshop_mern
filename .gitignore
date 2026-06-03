@@ -8,6 +8,9 @@ node_modules/
 
 # testing
 /coverage
+.stryker-tmp/
+.test-features-*.json
+/reports/mutation/
 
 # production
 /frontend/build
